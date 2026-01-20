@@ -974,74 +974,104 @@ After EVERY phase (project-level OR feature-level):
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Model Selection by Phase
+### Model Selection by TASK TYPE (Not Phase)
 
-| Phase | Primary Model | Fallback | Reason |
-|-------|---------------|----------|--------|
-| 1. INIT | **Haiku** | - | Simple directory creation |
-| 2. ANALYZE PROJECT | **Haiku** | Sonnet | File listing and counting |
-| 3. ANALYZE REQUIREMENTS | **Sonnet** | - | Understanding requirements |
-| 4. GAP ANALYSIS | **Sonnet** | - | Comparison logic |
-| 5. GENERATE | **Sonnet** | Opus | Code generation |
-| 6. TEST | **Haiku** | Sonnet | Running commands |
-| 6.5 QUALITY VALIDATION | **Sonnet** | - | Component analysis |
-| 7. CONSTITUTION | **Opus** | - | Strategic decisions |
-| 7.5 FEATURE BREAKDOWN | **Opus** | - | Architecture planning |
-| 8. SPEC | **Sonnet** | Opus | Detailed specification |
-| 9. PLAN | **Opus** | Sonnet | Architecture design |
-| 10. TASKS | **Sonnet** | - | Task breakdown |
-| 11. IMPLEMENT | **Sonnet** | - | Code writing |
-| 11.5 FEATURE QA | **Sonnet** | - | Code review |
-| 11.6 INTER-FEATURE | **Haiku** | Sonnet | Running tests |
-| 12. INTEGRATION QA | **Sonnet** | Opus | Full analysis |
-| 13. DELIVER | **Haiku** | - | Git operations |
+> **Model selection is based on WHAT you're doing, not WHICH phase you're in.**
+
+| Task Type | Model | Examples |
+|-----------|-------|----------|
+| **Git operations** | Haiku | commit, push, status, branch |
+| **File operations** | Haiku | list, move, copy, mkdir |
+| **Run commands** | Haiku | npm test, npm build, prettier |
+| **Simple search** | Haiku | grep, find, glob |
+| **Code writing** | Sonnet | implement feature, write function |
+| **Code review** | Sonnet | review PR, check quality |
+| **Test writing** | Sonnet | unit tests, integration tests |
+| **Bug fixing** | Sonnet | debug, fix error |
+| **Refactoring** | Sonnet | rename, extract, reorganize |
+| **Architecture design** | Opus | system design, data model |
+| **Security analysis** | Opus | vulnerability check, auth review |
+| **Complex planning** | Opus | multi-feature breakdown, risk assessment |
+| **Strategic decisions** | Opus | technology choice, trade-off analysis |
 
 ### Automatic Model Selection Logic
 
 ```python
-def select_model(task_type: str, complexity: int = 1) -> str:
+def select_model_for_task(task_description: str) -> str:
     """
-    Select appropriate model based on task type and complexity.
+    Select model based on TASK DESCRIPTION, not phase.
 
-    complexity: 1 = simple, 2 = medium, 3 = complex
+    Analyzes the task to determine complexity and selects appropriate model.
     """
 
-    # Light tasks → Haiku (fast, cheap)
-    haiku_tasks = [
-        "git_commit", "git_push", "git_status",
-        "file_list", "file_move", "file_search",
-        "format_check", "lint_run",
-        "directory_create", "test_run"
+    task_lower = task_description.lower()
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # HAIKU: Fast operations, running commands, simple file work
+    # ═══════════════════════════════════════════════════════════════════════
+    haiku_patterns = [
+        # Git operations
+        "git commit", "git push", "git pull", "git status",
+        "git checkout", "git branch", "git merge",
+
+        # File operations
+        "create directory", "mkdir", "move file", "copy file",
+        "list files", "ls", "find files",
+
+        # Running commands
+        "run test", "npm test", "npm build", "npm install",
+        "run prettier", "run eslint", "format code",
+
+        # Simple checks
+        "check status", "verify exists", "count lines"
     ]
 
-    # Medium tasks → Sonnet (best coding)
-    sonnet_tasks = [
-        "code_write", "code_review", "code_refactor",
-        "test_write", "spec_generate", "task_breakdown",
-        "build_fix", "doc_update", "e2e_test"
+    # ═══════════════════════════════════════════════════════════════════════
+    # OPUS: Deep reasoning, architecture, security, strategic decisions
+    # ═══════════════════════════════════════════════════════════════════════
+    opus_patterns = [
+        # Architecture
+        "design architecture", "system design", "data model design",
+        "database schema", "api design",
+
+        # Security
+        "security review", "security analysis", "vulnerability",
+        "authentication design", "authorization",
+
+        # Strategic planning
+        "feature breakdown", "project planning", "risk assessment",
+        "technology decision", "trade-off analysis",
+
+        # Complex analysis
+        "complex debug", "root cause analysis", "performance analysis"
     ]
 
-    # Complex tasks → Opus (deep reasoning)
-    opus_tasks = [
-        "architecture_design", "security_analysis",
-        "multi_phase_planning", "constitution_create",
-        "feature_breakdown", "complex_debug"
-    ]
-
-    if task_type in haiku_tasks:
-        return "haiku"
-    elif task_type in opus_tasks:
-        return "opus"
-    elif task_type in sonnet_tasks:
-        return "sonnet"
-    else:
-        # Default based on complexity
-        if complexity == 1:
+    # Check patterns
+    for pattern in haiku_patterns:
+        if pattern in task_lower:
             return "haiku"
-        elif complexity == 3:
+
+    for pattern in opus_patterns:
+        if pattern in task_lower:
             return "opus"
-        else:
-            return "sonnet"
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # SONNET: Default for coding tasks (best coding model)
+    # ═══════════════════════════════════════════════════════════════════════
+    return "sonnet"
+
+
+# Example usage within any phase:
+#
+# Phase 11 (IMPLEMENT) might use ALL THREE models:
+#   - "create src directory" → Haiku
+#   - "write user service" → Sonnet
+#   - "design auth flow" → Opus
+#
+# Phase 12 (QA) might use:
+#   - "run all tests" → Haiku
+#   - "review code quality" → Sonnet
+#   - "security audit" → Opus
 ```
 
 ### Cost Optimization
