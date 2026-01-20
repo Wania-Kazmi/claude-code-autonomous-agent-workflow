@@ -5,7 +5,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Ready-blue)](https://claude.ai/claude-code)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Autonomous](https://img.shields.io/badge/Autonomous-Spec--Kit--Plus-purple)](.)
-[![Validated](https://img.shields.io/badge/Components-50%2F50-brightgreen)](.)
+[![Validated](https://img.shields.io/badge/Components-51%2F51-brightgreen)](.)
 
 ---
 
@@ -675,7 +675,7 @@ The boilerplate comes with pre-loaded components that work out of the box:
 |---------|--------------|
 | `/sp.autonomous` | **Full autonomous build** from requirements |
 | `/q-status` | Check workflow state - which phase you're at |
-| `/q-validate` | Validate workflow order, detect violations |
+| `/q-validate` | Validate workflow order, detect violations, check component utilization |
 | `/q-reset` | Reset workflow state for fresh start |
 | `/plan` | Create implementation plan |
 | `/tdd` | Test-driven development |
@@ -686,6 +686,8 @@ The boilerplate comes with pre-loaded components that work out of the box:
 | `/test-coverage` | Check coverage |
 | `/update-codemaps` | Update architecture docs |
 | `/update-docs` | Sync documentation |
+| `/validate-workflow` | Run full workflow validation |
+| `/validate-components` | Check component quality (A-F grading) |
 
 ---
 
@@ -732,17 +734,95 @@ Don't want full autonomous mode? Use individual commands:
 ```
 autonomous-agent-boilerplate/
 │
-├── CLAUDE.md                      # Instructions for Claude
-├── .mcp.json                      # MCP server configuration
+├── CLAUDE.md                      # Instructions for Claude (Golden Rules)
+├── README.md                      # This documentation
+├── .mcp.json                      # MCP server configuration (6 servers)
 │
-└── .claude/
-    ├── settings.json              # Permissions
-    ├── hooks.json                 # 10 automation hooks
-    │
-    ├── agents/                    # 10 pre-loaded agents
-    ├── commands/                  # 10 slash commands
-    ├── rules/                     # 8 governance rules
-    └── skills/                    # 8 pre-loaded skills
+├── .claude/                       # Claude Code configuration
+│   ├── settings.json              # Permissions + environment variables
+│   ├── hooks.json                 # Automation hooks (PreToolUse/PostToolUse/Stop)
+│   ├── skill-rules.json           # Dynamic skill activation rules (18 patterns)
+│   │
+│   ├── agents/                    # 13 specialized agents
+│   │   ├── architect.md           # (opus) System design
+│   │   ├── planner.md             # (opus) Implementation planning
+│   │   ├── security-reviewer.md   # (opus) OWASP security analysis
+│   │   ├── tdd-guide.md           # (opus) Test-driven development
+│   │   ├── code-reviewer.md       # (sonnet) Code quality review
+│   │   ├── build-error-resolver.md# (sonnet) Fix build errors
+│   │   ├── e2e-runner.md          # (sonnet) Playwright E2E tests
+│   │   ├── refactor-cleaner.md    # (sonnet) Dead code removal
+│   │   ├── doc-updater.md         # (sonnet) Documentation sync
+│   │   ├── test-runner.md         # (sonnet) Test execution
+│   │   ├── git-ops.md             # (haiku) Git operations
+│   │   ├── file-ops.md            # (haiku) File operations
+│   │   └── format-checker.md      # (haiku) Prettier/ESLint
+│   │
+│   ├── commands/                  # 15 slash commands
+│   │   ├── sp.autonomous.md       # Full autonomous build (57KB)
+│   │   ├── q-status.md            # Workflow status
+│   │   ├── q-validate.md          # Workflow validation
+│   │   ├── q-reset.md             # Reset workflow
+│   │   ├── plan.md                # Implementation planning
+│   │   ├── tdd.md                 # Test-driven development
+│   │   ├── code-review.md         # Code review
+│   │   ├── build-fix.md           # Build error fixing
+│   │   ├── e2e.md                 # E2E testing
+│   │   ├── refactor-clean.md      # Dead code cleanup
+│   │   ├── test-coverage.md       # Coverage analysis
+│   │   ├── update-codemaps.md     # Architecture docs
+│   │   ├── update-docs.md         # Documentation sync
+│   │   ├── validate-workflow.md   # Workflow validation
+│   │   └── validate-components.md # Component quality check
+│   │
+│   ├── skills/                    # 10 reusable skills
+│   │   ├── api-patterns/          # REST/GraphQL patterns
+│   │   ├── backend-patterns/      # Backend architecture
+│   │   ├── coding-standards/      # Code quality patterns
+│   │   ├── database-patterns/     # Database/ORM patterns
+│   │   ├── testing-patterns/      # Testing patterns
+│   │   ├── claudeception/         # Session learning
+│   │   ├── mcp-code-execution-template/  # MCP integration
+│   │   ├── skill-gap-analyzer/    # Gap analysis
+│   │   ├── workflow-validator/    # Quality gate + component utilization
+│   │   └── component-quality-validator/  # Production-readiness check
+│   │
+│   ├── rules/                     # 8 governance rules
+│   │   ├── agents.md              # Agent orchestration
+│   │   ├── coding-style.md        # Immutability, file organization
+│   │   ├── git-workflow.md        # Conventional commits
+│   │   ├── hooks.md               # Hook system docs
+│   │   ├── patterns.md            # API/service patterns
+│   │   ├── performance.md         # Model selection
+│   │   ├── security.md            # OWASP Top 10
+│   │   └── testing.md             # 80% coverage, TDD
+│   │
+│   ├── hooks/                     # Hook scripts
+│   │   ├── skill-activator.sh     # Dynamic skill activation
+│   │   ├── skill-enforcement-stop.sh  # End-of-session enforcement
+│   │   └── claudeception-activator.sh # Session learning
+│   │
+│   └── logs/                      # Activity logs
+│       ├── agent-usage.log        # Task tool invocations
+│       ├── skill-invocations.log  # Skill() calls
+│       ├── skill-activations.log  # Skill activator output
+│       ├── skill-enforcement.log  # Enforcement decisions
+│       ├── tool-usage.log         # Write/Edit operations
+│       └── file-changes.log       # File modifications
+│
+├── .specify/                      # Spec-Kit-Plus workflow artifacts
+│   ├── project-analysis.json      # Existing project analysis
+│   ├── requirements-analysis.json # Requirements parsing
+│   ├── gap-analysis.json          # Missing components
+│   ├── constitution.md            # Project rules
+│   ├── spec.md                    # Specification
+│   ├── plan.md                    # Implementation plan
+│   ├── tasks.md                   # Task checklist
+│   ├── templates/                 # Feature templates
+│   └── validations/               # Phase validation reports
+│
+└── requirements/                  # Your requirements files
+    └── my-app.md                  # Example requirements
 ```
 
 ### Rules Enforced
@@ -754,6 +834,118 @@ autonomous-agent-boilerplate/
 | **Test Coverage** | Minimum 80% |
 | **Security** | OWASP Top 10 checked |
 | **Code Quality** | Auto-formatted, reviewed |
+
+---
+
+## 📊 Monitoring & Observability
+
+The boilerplate includes comprehensive logging to track what's happening during autonomous builds.
+
+### Log Files
+
+All logs are stored in `.claude/logs/`:
+
+| Log File | What It Tracks | Example Entry |
+|----------|----------------|---------------|
+| `agent-usage.log` | Task tool invocations (agent spawning) | `[2024-01-21T10:30:00] Agent task invoked` |
+| `skill-invocations.log` | Skill() tool calls | `[2024-01-21T10:31:00] Skill invoked: coding-standards` |
+| `skill-activations.log` | Skill activator hook output | `Prompt: "build api" \| Matched: api-patterns` |
+| `skill-enforcement.log` | Enforcement decisions | `MANDATORY skill not used: testing-patterns` |
+| `tool-usage.log` | Write/Edit tool calls | `[2024-01-21T10:32:00] Tool: Edit \| File: src/api.ts` |
+| `file-changes.log` | File modifications | `[2024-01-21T10:32:00] File modified: src/api.ts` |
+
+### Viewing Logs
+
+```bash
+# View recent skill invocations
+tail -20 .claude/logs/skill-invocations.log
+
+# Watch agent usage in real-time
+tail -f .claude/logs/agent-usage.log
+
+# Check which skills were activated
+cat .claude/logs/skill-activations.log | grep "DETECTED MATCHES"
+
+# See enforcement decisions
+cat .claude/logs/skill-enforcement.log
+
+# Count skill usage
+wc -l .claude/logs/skill-invocations.log
+```
+
+### Component Utilization Check
+
+The `workflow-validator` skill tracks if custom components are being used:
+
+```bash
+# Check component utilization during a build
+claude "/q-validate"
+```
+
+This shows:
+- **Skills Used**: Which skills were invoked via `Skill(name)`
+- **Agents Used**: Which agents were spawned via `Task(subagent_type)`
+- **Utilization %**: Percentage of available components that were used
+- **Bypass Detection**: Warning if general agent did work without using custom components
+
+### Phase Validation Reports
+
+After each phase, validation reports are generated in `.specify/validations/`:
+
+```bash
+# List validation reports
+ls .specify/validations/
+
+# View a specific phase report
+cat .specify/validations/phase-11-report.md
+```
+
+Example report structure:
+```markdown
+# Phase 11 Validation Report
+
+## Summary
+| Field | Value |
+|-------|-------|
+| Phase | 11: IMPLEMENT |
+| Grade | B |
+| Score | 85/100 |
+| Status | APPROVED |
+
+## Component Utilization
+| Category | Available | Used | Percentage |
+|----------|-----------|------|------------|
+| Skills | 10 | 4 | 40% |
+| Agents | 13 | 3 | 23% |
+
+## Issues Found
+- Missing skill invocation: testing-patterns
+
+## Decision
+✅ APPROVED - Proceeding to Phase 12
+```
+
+### Reset Detection
+
+If a phase is reset due to component bypass:
+
+```bash
+# Check reset counter
+cat .specify/validations/reset-counter.json
+
+# View bypass log
+cat .specify/validations/bypass-log.json
+```
+
+### Environment Variables
+
+The following environment variables control workflow behavior:
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `AUTONOMOUS_MODE` | `true` | Enable full autonomous execution |
+| `MAX_SELF_HEAL_RETRIES` | `3` | Max retry attempts per phase |
+| `SKILL_ENFORCEMENT` | `strict` | Enforce skill usage (strict/warn/off) |
 
 ---
 
