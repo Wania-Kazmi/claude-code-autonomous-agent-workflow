@@ -4,17 +4,30 @@
 
 Located in `.claude/agents/`:
 
+### Opus Agents (Complex Tasks)
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|
-| planner | Implementation planning | Complex features, refactoring |
 | architect | System design | Architectural decisions |
+| planner | Implementation planning | Complex features, refactoring |
+| security-reviewer | Security analysis | Before commits, auth code |
 | tdd-guide | Test-driven development | New features, bug fixes |
+
+### Sonnet Agents (Medium Tasks)
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
 | code-reviewer | Code review | After writing code |
-| security-reviewer | Security analysis | Before commits |
 | build-error-resolver | Fix build errors | When build fails |
 | e2e-runner | E2E testing | Critical user flows |
 | refactor-cleaner | Dead code cleanup | Code maintenance |
 | doc-updater | Documentation | Updating docs |
+| test-runner | Run tests | Validate implementations |
+
+### Haiku Agents (Light Tasks)
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| git-ops | Git operations | Commits, pushes, status |
+| file-ops | File operations | List, search, move files |
+| format-checker | Formatting | Prettier, ESLint runs |
 
 ## Immediate Agent Usage
 

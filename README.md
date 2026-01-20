@@ -617,20 +617,42 @@ A full-featured e-commerce platform for small businesses.
 
 The boilerplate comes with pre-loaded components that work out of the box:
 
-### Agents (10)
+### Agents (13) - With Dynamic Model Selection
 
-| Agent | Purpose |
-|-------|---------|
-| **planner** | Creates implementation plans |
-| **architect** | System design decisions |
-| **tdd-guide** | Test-driven development |
-| **code-reviewer** | Quality & security review |
-| **security-reviewer** | OWASP Top 10 checks |
-| **build-error-resolver** | Fix build errors |
-| **e2e-runner** | Playwright E2E tests |
-| **refactor-cleaner** | Remove dead code |
-| **doc-updater** | Update documentation |
-| **test-runner** | Run tests |
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| **architect** | Opus | System design decisions |
+| **planner** | Opus | Creates implementation plans |
+| **security-reviewer** | Opus | OWASP Top 10 checks |
+| **tdd-guide** | Opus | Test-driven development |
+| **code-reviewer** | Sonnet | Quality & security review |
+| **build-error-resolver** | Sonnet | Fix build errors |
+| **e2e-runner** | Sonnet | Playwright E2E tests |
+| **refactor-cleaner** | Sonnet | Remove dead code |
+| **doc-updater** | Sonnet | Update documentation |
+| **test-runner** | Sonnet | Run tests |
+| **git-ops** | Haiku | Git commits, pushes, status |
+| **file-ops** | Haiku | File listing, searching, moving |
+| **format-checker** | Haiku | Prettier, ESLint, formatting |
+
+### Model Selection Strategy
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    DYNAMIC MODEL SELECTION                                   │
+│                                                                             │
+│   OPUS (Complex)          SONNET (Medium)         HAIKU (Light)            │
+│   ──────────────          ───────────────         ─────────────            │
+│   • Architecture          • Code writing          • Git operations         │
+│   • Security analysis     • Code review           • File operations        │
+│   • Multi-phase planning  • Test writing          • Formatting             │
+│   • Constitution          • Build fixes           • Simple validations     │
+│                                                                             │
+│   Cost: $$$$$             Cost: $$$$              Cost: $$$                │
+│   ~10 calls/project       ~100 calls/project      ~50 calls/project        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ### Skills (10)
 

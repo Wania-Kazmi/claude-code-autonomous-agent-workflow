@@ -922,3 +922,143 @@ After EVERY phase (project-level OR feature-level):
 - Grade: A/B/C (APPROVED) or D/F (REJECTED)
 - Generate validation report
 - Retry up to 3 times if rejected
+
+---
+
+## DYNAMIC MODEL SELECTION
+
+> **Use the right model for the right task: Opus for complex, Sonnet for medium, Haiku for light.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      DYNAMIC MODEL SELECTION                                 │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  OPUS (Deepest Reasoning)                                               ││
+│  │  ───────────────────────                                                ││
+│  │  • Architecture design (Phase 9 for COMPLEX projects)                   ││
+│  │  • Security analysis (Phase 12 security review)                         ││
+│  │  • Multi-phase planning (Phase 7.5 feature breakdown)                   ││
+│  │  • Complex debugging and error analysis                                 ││
+│  │  • Constitution creation (Phase 7)                                      ││
+│  │                                                                         ││
+│  │  Agents: architect, planner, security-reviewer, tdd-guide               ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  SONNET (Best Coding Model)                                             ││
+│  │  ──────────────────────────                                             ││
+│  │  • Feature implementation (Phase 11)                                    ││
+│  │  • Code review (Phase 11.5, 12)                                         ││
+│  │  • Test writing (TDD cycle)                                             ││
+│  │  • Build error resolution                                               ││
+│  │  • Spec and tasks generation (Phase 8, 10)                              ││
+│  │  • Refactoring                                                          ││
+│  │                                                                         ││
+│  │  Agents: code-reviewer, build-error-resolver, e2e-runner,               ││
+│  │          refactor-cleaner, doc-updater, test-runner                     ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  HAIKU (Fast & Cost-Efficient)                                          ││
+│  │  ─────────────────────────────                                          ││
+│  │  • Git operations (commits, pushes, status)                             ││
+│  │  • File operations (list, search, move)                                 ││
+│  │  • Format checking (prettier, eslint)                                   ││
+│  │  • Simple validations                                                   ││
+│  │  • Directory setup (Phase 1)                                            ││
+│  │                                                                         ││
+│  │  Agents: git-ops, file-ops, format-checker                              ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Model Selection by Phase
+
+| Phase | Primary Model | Fallback | Reason |
+|-------|---------------|----------|--------|
+| 1. INIT | **Haiku** | - | Simple directory creation |
+| 2. ANALYZE PROJECT | **Haiku** | Sonnet | File listing and counting |
+| 3. ANALYZE REQUIREMENTS | **Sonnet** | - | Understanding requirements |
+| 4. GAP ANALYSIS | **Sonnet** | - | Comparison logic |
+| 5. GENERATE | **Sonnet** | Opus | Code generation |
+| 6. TEST | **Haiku** | Sonnet | Running commands |
+| 6.5 QUALITY VALIDATION | **Sonnet** | - | Component analysis |
+| 7. CONSTITUTION | **Opus** | - | Strategic decisions |
+| 7.5 FEATURE BREAKDOWN | **Opus** | - | Architecture planning |
+| 8. SPEC | **Sonnet** | Opus | Detailed specification |
+| 9. PLAN | **Opus** | Sonnet | Architecture design |
+| 10. TASKS | **Sonnet** | - | Task breakdown |
+| 11. IMPLEMENT | **Sonnet** | - | Code writing |
+| 11.5 FEATURE QA | **Sonnet** | - | Code review |
+| 11.6 INTER-FEATURE | **Haiku** | Sonnet | Running tests |
+| 12. INTEGRATION QA | **Sonnet** | Opus | Full analysis |
+| 13. DELIVER | **Haiku** | - | Git operations |
+
+### Automatic Model Selection Logic
+
+```python
+def select_model(task_type: str, complexity: int = 1) -> str:
+    """
+    Select appropriate model based on task type and complexity.
+
+    complexity: 1 = simple, 2 = medium, 3 = complex
+    """
+
+    # Light tasks → Haiku (fast, cheap)
+    haiku_tasks = [
+        "git_commit", "git_push", "git_status",
+        "file_list", "file_move", "file_search",
+        "format_check", "lint_run",
+        "directory_create", "test_run"
+    ]
+
+    # Medium tasks → Sonnet (best coding)
+    sonnet_tasks = [
+        "code_write", "code_review", "code_refactor",
+        "test_write", "spec_generate", "task_breakdown",
+        "build_fix", "doc_update", "e2e_test"
+    ]
+
+    # Complex tasks → Opus (deep reasoning)
+    opus_tasks = [
+        "architecture_design", "security_analysis",
+        "multi_phase_planning", "constitution_create",
+        "feature_breakdown", "complex_debug"
+    ]
+
+    if task_type in haiku_tasks:
+        return "haiku"
+    elif task_type in opus_tasks:
+        return "opus"
+    elif task_type in sonnet_tasks:
+        return "sonnet"
+    else:
+        # Default based on complexity
+        if complexity == 1:
+            return "haiku"
+        elif complexity == 3:
+            return "opus"
+        else:
+            return "sonnet"
+```
+
+### Cost Optimization
+
+```
+COST COMPARISON (approximate):
+┌────────┬────────────┬──────────────────────────────────┐
+│ Model  │ Cost/Token │ Best For                          │
+├────────┼────────────┼──────────────────────────────────┤
+│ Haiku  │ $$$        │ High-frequency, simple tasks     │
+│ Sonnet │ $$$$       │ Main development work            │
+│ Opus   │ $$$$$      │ Complex reasoning, architecture  │
+└────────┴────────────┴──────────────────────────────────┘
+
+SAVINGS STRATEGY:
+- Use Haiku for git ops: ~3x cheaper than Sonnet
+- Use Haiku for file ops: ~3x cheaper than Sonnet
+- Reserve Opus for planning: ~10 calls per project
+- Main work in Sonnet: Best quality/cost balance
+```
