@@ -1,0 +1,122 @@
+{
+  "_description": "Dynamic skill activation rules - maps technology patterns to trigger keywords. Skills are discovered at runtime from .claude/skills/",
+  "_version": "2.0.0",
+  "_note": "This file defines PATTERNS, not specific skills. The activator scans actual skills and matches their descriptions.",
+
+  "technologyPatterns": {
+    "python-api": {
+      "keywords": ["fastapi", "python api", "rest api", "api endpoint", "uvicorn", "pydantic", "async api", "python backend", "flask", "django"],
+      "intentPatterns": ["create.*api", "implement.*endpoint", "build.*service", "add.*route", "python.*backend"],
+      "priority": "high"
+    },
+    "javascript-api": {
+      "keywords": ["express", "node api", "nodejs", "node.js", "javascript api", "typescript api", "koa", "hapi"],
+      "intentPatterns": ["create.*node.*api", "express.*server", "nodejs.*backend"],
+      "priority": "high"
+    },
+    "frontend": {
+      "keywords": ["nextjs", "next.js", "react", "frontend", "web app", "ui component", "vue", "angular", "svelte"],
+      "intentPatterns": ["create.*frontend", "build.*ui", "implement.*page", "add.*component"],
+      "priority": "high"
+    },
+    "database": {
+      "keywords": ["postgresql", "postgres", "mysql", "database", "sql", "mongodb", "redis", "schema", "migration", "tables"],
+      "intentPatterns": ["setup.*database", "create.*schema", "configure.*db", "add.*table", "database.*migration"],
+      "priority": "high"
+    },
+    "kubernetes": {
+      "keywords": ["kubernetes", "k8s", "deployment", "kubectl", "helm", "pod", "service manifest", "ingress"],
+      "intentPatterns": ["deploy.*kubernetes", "create.*manifest", "k8s.*deployment", "setup.*cluster"],
+      "priority": "high"
+    },
+    "docker": {
+      "keywords": ["docker", "dockerfile", "container", "containerize", "docker-compose", "image"],
+      "intentPatterns": ["create.*dockerfile", "containerize.*app", "docker.*build"],
+      "priority": "medium"
+    },
+    "testing": {
+      "keywords": ["test", "unit test", "integration test", "pytest", "jest", "coverage", "tdd", "spec"],
+      "intentPatterns": ["write.*test", "add.*test", "test.*function", "run.*test", "check.*coverage"],
+      "priority": "high"
+    },
+    "ci-cd": {
+      "keywords": ["github actions", "ci/cd", "pipeline", "workflow", "gitlab ci", "jenkins", "deployment pipeline"],
+      "intentPatterns": ["setup.*ci", "create.*pipeline", "automate.*deploy"],
+      "priority": "medium"
+    },
+    "authentication": {
+      "keywords": ["auth", "authentication", "jwt", "oauth", "login", "signup", "session", "token"],
+      "intentPatterns": ["implement.*auth", "add.*login", "create.*authentication"],
+      "priority": "high"
+    },
+    "messaging": {
+      "keywords": ["kafka", "rabbitmq", "message queue", "event streaming", "pubsub", "redis queue"],
+      "intentPatterns": ["setup.*kafka", "implement.*messaging", "create.*queue"],
+      "priority": "medium"
+    },
+    "documentation": {
+      "keywords": ["documentation", "docs", "readme", "api docs", "swagger", "openapi"],
+      "intentPatterns": ["create.*docs", "write.*documentation", "generate.*api.*docs"],
+      "priority": "low"
+    },
+    "specification": {
+      "keywords": ["specification", "spec", "requirements", "user stories", "acceptance criteria", "features"],
+      "intentPatterns": ["create.*spec", "write.*requirements", "define.*features"],
+      "priority": "high"
+    },
+    "planning": {
+      "keywords": ["plan", "implementation plan", "architecture", "design", "data model", "api contract"],
+      "intentPatterns": ["create.*plan", "design.*architecture", "plan.*implementation"],
+      "priority": "high"
+    },
+    "task-management": {
+      "keywords": ["tasks", "task list", "breakdown", "work items", "todo", "backlog"],
+      "intentPatterns": ["create.*tasks", "break.*down", "generate.*task"],
+      "priority": "high"
+    },
+    "code-review": {
+      "keywords": ["review", "code review", "check code", "security check", "quality", "lint"],
+      "intentPatterns": ["review.*code", "check.*security", "validate.*code"],
+      "priority": "high"
+    },
+    "project-init": {
+      "keywords": ["new project", "initialize", "bootstrap", "setup project", "start project", "requirements file"],
+      "intentPatterns": ["create.*project", "initialize.*from", "bootstrap.*project", "analyze.*requirements"],
+      "priority": "critical"
+    }
+  },
+
+  "contextTriggers": {
+    "before_commit": {
+      "patterns": ["commit", "git commit", "push", "ready to commit"],
+      "requiredCategories": ["testing", "code-review"]
+    },
+    "before_pr": {
+      "patterns": ["pull request", "create pr", "open pr", "merge request"],
+      "requiredCategories": ["testing", "code-review"]
+    },
+    "new_project": {
+      "patterns": ["new project", "start project", "initialize", "bootstrap", "requirements"],
+      "requiredCategories": ["project-init", "specification"]
+    },
+    "after_implementation": {
+      "patterns": ["implemented", "finished coding", "completed feature", "done with"],
+      "requiredCategories": ["testing", "code-review"]
+    }
+  },
+
+  "enforcementRules": {
+    "mandatory": {
+      "description": "MUST use matching skill - block if skipped",
+      "categories": ["project-init", "specification", "planning", "testing", "code-review"]
+    },
+    "suggested": {
+      "description": "Should use - warn if skipped",
+      "categories": ["documentation", "ci-cd"]
+    },
+    "optional": {
+      "description": "Use if helpful",
+      "categories": []
+    }
+  }
+}

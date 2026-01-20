@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json.schemastore.org/mcp.json",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./"],
+      "env": {},
+      "description": "Filesystem operations"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub operations - PRs, issues, repos"
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "description": "Persistent memory across sessions"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server"],
+      "description": "Live documentation lookup"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Chain-of-thought reasoning"
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      },
+      "description": "Web scraping and crawling"
+    }
+  },
+  "_comments": {
+    "usage": "MCP server configuration for Claude Code",
+    "env_vars": "Replace ${VAR} placeholders with actual values or set in environment",
+    "context_warning": "Keep under 10 MCPs enabled to preserve context window",
+    "available_servers_to_add": [
+      "@modelcontextprotocol/server-postgres - PostgreSQL database queries",
+      "@modelcontextprotocol/server-puppeteer - Browser automation",
+      "@supabase/mcp-server-supabase - Supabase database operations",
+      "vercel (http://mcp.vercel.com) - Vercel deployments",
+      "@railway/mcp-server - Railway deployments",
+      "clickhouse (http://mcp.clickhouse.cloud/mcp) - Analytics queries"
+    ]
+  }
+}

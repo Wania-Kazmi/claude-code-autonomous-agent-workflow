@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (keep structure, ignore content)
+.claude/logs/*.log
+!.claude/logs/.gitkeep
+
+# Build reports (keep structure, ignore content)
+.claude/build-reports/*
+!.claude/build-reports/.gitkeep
+
+# Generated during build (will be recreated)
+.specify/spec.md
+.specify/plan.md
+.specify/tasks.md
+.specify/data-model.md
+.specify/contracts/
+
+# Test artifacts
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Temporary
+*.tmp
+*.temp
