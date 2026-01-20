@@ -90,6 +90,108 @@ Constitution → Feature Breakdown → [Feature 1: Spec→Plan→Tasks→Impleme
 
 ---
 
+## CRITICAL: SKILL LOADING PROTOCOL
+
+> **The `Skill()` tool registry is cached at session start. Generated skills WON'T be recognized via `Skill()`. Use DIRECT FILE READING instead.**
+
+### Why This Matters
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SKILL LOADING DURING AUTONOMOUS BUILD                     │
+│                                                                             │
+│  PROBLEM:                                                                   │
+│  - Phase 5 generates custom skills (e.g., express-patterns)                 │
+│  - Skill() tool won't recognize them (registry cached)                      │
+│  - Phase 11 needs to USE those skills                                       │
+│                                                                             │
+│  SOLUTION: Direct File Reading                                              │
+│  - DON'T use: Skill("express-patterns")  ❌                                 │
+│  - DO use:    Read(".claude/skills/express-patterns/SKILL.md")  ✅          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### How to Load Skills
+
+```python
+def load_skill(skill_name: str) -> str:
+    """Load a skill by reading its file directly."""
+
+    skill_path = f".claude/skills/{skill_name}/SKILL.md"
+
+    # Use Read tool to get skill content
+    skill_content = Read(skill_path)
+
+    return skill_content
+
+
+def apply_skill(skill_name: str, task: str) -> None:
+    """Load and apply a skill to a task."""
+
+    # 1. Read the skill file directly
+    skill_content = load_skill(skill_name)
+
+    # 2. Extract relevant sections (patterns, templates, validation)
+    # 3. Apply to current task
+    # 4. Follow skill's workflow
+```
+
+### Skill Loading by Phase
+
+| Phase | Skills Needed | Loading Method |
+|-------|---------------|----------------|
+| 5. GENERATE | skill-gap-analyzer | Pre-loaded (exists at session start) |
+| 6.5 VALIDATION | component-quality-validator | **Read file directly** |
+| 7. CONSTITUTION | coding-standards | Pre-loaded |
+| 11. IMPLEMENT | Generated skills (express, prisma, etc.) | **Read file directly** |
+| 11.5 FEATURE QA | testing-patterns | Pre-loaded |
+| 12. INTEGRATION | workflow-validator | **Read file directly** |
+
+### Implementation Pattern
+
+When executing a task that requires a generated skill:
+
+```markdown
+## Task: Implement User Authentication
+
+### Step 1: Load Required Skill
+Read `.claude/skills/express-patterns/SKILL.md` to get:
+- API route patterns
+- Middleware templates
+- Error handling patterns
+
+### Step 2: Apply Skill Patterns
+Using the loaded skill content, implement:
+- Route: POST /auth/login
+- Middleware: JWT verification
+- Error handling: AuthError class
+
+### Step 3: Validate Against Skill
+Check implementation matches skill's validation criteria.
+```
+
+### Pre-Loaded vs Generated Skills
+
+```
+PRE-LOADED SKILLS (exist at session start, Skill() works):
+├── api-patterns
+├── backend-patterns
+├── coding-standards
+├── database-patterns
+├── testing-patterns
+├── skill-gap-analyzer
+└── claudeception
+
+GENERATED SKILLS (created during build, use Read):
+├── {project}-express-patterns  ← Read directly
+├── {project}-prisma-setup      ← Read directly
+├── {project}-auth-patterns     ← Read directly
+└── {project}-*                 ← Read directly
+```
+
+---
+
 ## PHASE 0: PRE-CHECK (ALWAYS RUNS)
 
 > **Detects current state, determines complexity, decides whether to start fresh or resume.**
