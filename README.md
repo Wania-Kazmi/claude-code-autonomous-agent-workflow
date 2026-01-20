@@ -669,7 +669,7 @@ The boilerplate comes with pre-loaded components that work out of the box:
 | **workflow-validator** | Check workflow state, detect violations |
 | **component-quality-validator** | Validate generated components are production-ready |
 
-### Commands (13)
+### Commands (15)
 
 | Command | What It Does |
 |---------|--------------|
