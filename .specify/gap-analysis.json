@@ -1,0 +1,82 @@
+{
+  "skills_existing": [
+    "api-patterns",
+    "backend-patterns",
+    "coding-standards",
+    "database-patterns",
+    "testing-patterns",
+    "claudeception",
+    "mcp-code-execution-template",
+    "skill-gap-analyzer",
+    "workflow-validator",
+    "nextjs-server-side-error-debugging",
+    "prisma-connection-pool-exhaustion",
+    "typescript-circular-dependency"
+  ],
+  "skills_missing": [
+    "express-patterns",
+    "prisma-patterns",
+    "jwt-auth-patterns",
+    "zod-validation-patterns"
+  ],
+  "agents_existing": [
+    "architect",
+    "build-error-resolver",
+    "code-reviewer",
+    "doc-updater",
+    "e2e-runner",
+    "planner",
+    "refactor-cleaner",
+    "security-reviewer",
+    "tdd-guide",
+    "test-runner"
+  ],
+  "agents_missing": [],
+  "hooks_existing": [
+    "PreToolUse-dev-server-blocker",
+    "PreToolUse-tmux-reminder",
+    "PreToolUse-git-push-review",
+    "PreToolUse-doc-file-blocker",
+    "PostToolUse-pr-logging",
+    "PostToolUse-prettier-formatting",
+    "PostToolUse-console-log-warning",
+    "Stop-console-log-audit"
+  ],
+  "hooks_missing": [],
+  "technology_coverage": {
+    "express": {
+      "covered_by": ["api-patterns", "backend-patterns"],
+      "needs_specific": "express-patterns"
+    },
+    "typescript": {
+      "covered_by": ["coding-standards"],
+      "needs_specific": null
+    },
+    "postgresql": {
+      "covered_by": ["database-patterns"],
+      "needs_specific": null
+    },
+    "prisma": {
+      "covered_by": ["prisma-connection-pool-exhaustion"],
+      "needs_specific": "prisma-patterns"
+    },
+    "jwt": {
+      "covered_by": [],
+      "needs_specific": "jwt-auth-patterns"
+    },
+    "zod": {
+      "covered_by": [],
+      "needs_specific": "zod-validation-patterns"
+    },
+    "jest": {
+      "covered_by": ["testing-patterns"],
+      "needs_specific": null
+    }
+  },
+  "summary": {
+    "total_skills_needed": 4,
+    "total_agents_needed": 0,
+    "total_hooks_needed": 0,
+    "ready_to_generate": true
+  }
+}

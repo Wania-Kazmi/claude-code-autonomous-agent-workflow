@@ -1,0 +1,44 @@
+{
+  "project_type": "autonomous-agent-boilerplate",
+  "existing_skills": [
+    "api-patterns",
+    "backend-patterns",
+    "nextjs-server-side-error-debugging",
+    "prisma-connection-pool-exhaustion",
+    "typescript-circular-dependency",
+    "claudeception",
+    "coding-standards",
+    "database-patterns",
+    "mcp-code-execution-template",
+    "skill-gap-analyzer",
+    "testing-patterns",
+    "workflow-validator"
+  ],
+  "existing_agents": [
+    "architect",
+    "build-error-resolver",
+    "code-reviewer",
+    "doc-updater",
+    "e2e-runner",
+    "planner",
+    "refactor-cleaner",
+    "security-reviewer",
+    "tdd-guide",
+    "test-runner"
+  ],
+  "existing_hooks": [
+    "PreToolUse-dev-server-blocker",
+    "PreToolUse-tmux-reminder",
+    "PreToolUse-git-push-review",
+    "PreToolUse-doc-file-blocker",
+    "PostToolUse-pr-logging",
+    "PostToolUse-prettier-formatting",
+    "PostToolUse-console-log-warning",
+    "Stop-console-log-audit"
+  ],
+  "has_source_code": false,
+  "has_tests": false,
+  "language": "typescript",
+  "skill_count": 12,
+  "agent_count": 10
+}

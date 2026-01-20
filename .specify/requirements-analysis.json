@@ -1,0 +1,81 @@
+{
+  "project_name": "todo-api",
+  "project_type": "api",
+  "technologies_required": [
+    "express",
+    "typescript",
+    "postgresql",
+    "prisma",
+    "jwt",
+    "zod",
+    "jest"
+  ],
+  "features": [
+    {
+      "name": "User Registration",
+      "description": "User registration with email and password"
+    },
+    {
+      "name": "User Login",
+      "description": "User login with JWT authentication"
+    },
+    {
+      "name": "Password Reset",
+      "description": "Password reset via email"
+    },
+    {
+      "name": "Create Todo",
+      "description": "Create todo items"
+    },
+    {
+      "name": "List Todos",
+      "description": "List all todos for logged-in user"
+    },
+    {
+      "name": "Update Todo",
+      "description": "Update todo (title, description, status)"
+    },
+    {
+      "name": "Delete Todo",
+      "description": "Delete todo"
+    },
+    {
+      "name": "Toggle Todo Status",
+      "description": "Mark todo as complete/incomplete"
+    },
+    {
+      "name": "Create Categories",
+      "description": "Create categories for organizing todos"
+    },
+    {
+      "name": "Assign Categories",
+      "description": "Assign todos to categories"
+    },
+    {
+      "name": "Filter by Category",
+      "description": "Filter todos by category"
+    }
+  ],
+  "constraints": [
+    "Response time < 200ms",
+    "Proper error handling with standard error format",
+    "Input validation on all endpoints",
+    "Rate limiting: 100 requests/minute per user"
+  ],
+  "api_endpoints": [
+    "POST /auth/register",
+    "POST /auth/login",
+    "POST /auth/reset-password",
+    "GET /todos",
+    "POST /todos",
+    "GET /todos/:id",
+    "PUT /todos/:id",
+    "DELETE /todos/:id",
+    "GET /categories",
+    "POST /categories"
+  ],
+  "testing_requirements": {
+    "framework": "jest",
+    "coverage_minimum": 80
+  }
+}
