@@ -1,344 +1,378 @@
-# Production-Ready Claude Code Template
+# Autonomous Agent Boilerplate for Claude Code
 
-> **Production-ready configuration for Claude Code.** Pre-configured agents, commands, hooks, skills, and rules for high-quality software development.
+> **Build entire projects from a single requirements file.** This boilerplate doesn't just provide pre-configured agents — it **autonomously generates** the skills, agents, hooks, and code your project needs using the Spec-Kit-Plus workflow.
 
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Ready-blue)](https://claude.ai/claude-code)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Validated](https://img.shields.io/badge/Validated-46%2F46%20Components-brightgreen)](.)
-[![Download](https://img.shields.io/badge/Download-Ready%20to%20Use-orange)](.)
+[![Autonomous](https://img.shields.io/badge/Autonomous-Spec--Kit--Plus-purple)](.)
+[![Validated](https://img.shields.io/badge/Components-46%2F46-brightgreen)](.)
 
-### ✅ Validation Status: 46/46 Components (100%)
+---
 
-| Component | Count | Status |
-|-----------|-------|--------|
-| Agents | 10 | ✅ Complete |
-| Commands | 10 | ✅ Complete |
-| Skills | 8 | ✅ Complete |
-| Rules | 8 | ✅ Complete |
-| Hooks | 10 | ✅ Complete |
-| MCP Servers | 6 | ✅ Complete |
+## 🚀 The Core Idea
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   YOU WRITE:                        BOILERPLATE GENERATES:                  │
+│   ───────────                       ──────────────────────                  │
+│                                                                             │
+│   requirements/my-app.md    →→→     ✓ Skills for YOUR tech stack           │
+│                                     ✓ Agents for YOUR project needs        │
+│                                     ✓ Hooks for YOUR workflow              │
+│                                     ✓ Complete project with tests          │
+│                                     ✓ 80%+ code coverage                   │
+│                                     ✓ Security-reviewed code               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**One command. Full project. No manual setup.**
+
+```bash
+claude "/sp.autonomous requirements/my-app.md"
+```
 
 ---
 
 ## 📋 Table of Contents
 
-- [What is This?](#-what-is-this)
-- [Quick Start (5 Minutes)](#-quick-start-5-minutes)
-- [For Absolute Beginners](#-for-absolute-beginners)
-- [Available Commands](#-available-commands)
-- [The Recommended Workflow](#-the-recommended-workflow)
+- [How It Works](#-how-it-works)
+- [Quick Start](#-quick-start)
+- [The Spec-Kit-Plus Workflow](#-the-spec-kit-plus-workflow)
+- [Writing Requirements](#-writing-requirements)
+- [Pre-Loaded Components](#-pre-loaded-components)
+- [Manual Mode (Optional)](#-manual-mode-optional)
 - [Understanding the Structure](#-understanding-the-structure)
-- [Agents Explained](#-agents-explained)
-- [Skills Explained](#-skills-explained)
-- [Rules & Best Practices](#-rules--best-practices)
-- [Hooks (Automation)](#-hooks-automation)
-- [MCP Servers](#-mcp-servers)
-- [Step-by-Step Examples](#-step-by-step-examples)
-- [Autonomous Mode](#-autonomous-mode)
+- [Customization](#-customization)
 - [Troubleshooting](#-troubleshooting)
 - [FAQ](#-faq)
-- [Contributing](#-contributing)
 
 ---
 
-## 🎯 What is This?
+## 🎯 How It Works
 
-This is a **pre-configured template** for [Claude Code](https://claude.ai/claude-code) that gives you:
+### Step 1: You Write Requirements
 
-| Feature | What It Does | Count |
-|---------|--------------|-------|
-| **Agents** | Specialized AI assistants for different tasks | 10 |
-| **Commands** | Slash commands like `/plan`, `/tdd`, `/code-review` | 10 |
-| **Rules** | Coding standards automatically enforced | 8 |
-| **Hooks** | Auto-format, warn about issues, block mistakes | 10 |
-| **Skills** | Reusable patterns (testing, API, database, coding) | 8 |
-| **MCP Servers** | Extended capabilities (GitHub, memory, web scraping) | 6 |
+Create a simple markdown file describing what you want to build:
 
-### Why Use This Template?
+```markdown
+# My E-Commerce API
 
-| Without Template | With Template |
-|------------------|---------------|
-| Claude writes code immediately | Claude creates a plan first, waits for approval |
-| No code review | Automatic security and quality checks |
-| Inconsistent coding style | Enforced standards (immutability, file size limits) |
-| Manual formatting | Auto-format on every save |
-| Hope tests work | Test-driven development enforced |
-| Debug in production | Catch bugs before commit |
+## Features
+- User authentication (JWT)
+- Product catalog with search
+- Shopping cart
+- Order processing
+
+## Technical
+- Backend: Node.js + Express
+- Database: PostgreSQL + Prisma
+- Testing: Jest
+```
+
+### Step 2: Run One Command
+
+```bash
+claude "/sp.autonomous requirements/my-app.md"
+```
+
+### Step 3: Boilerplate Takes Over
+
+The autonomous workflow:
+
+1. **Analyzes** your requirements file
+2. **Detects** technologies (Node.js, Express, PostgreSQL, Prisma, Jest)
+3. **Generates** custom skills for your stack
+4. **Generates** specialized agents for your project
+5. **Generates** quality hooks for your workflow
+6. **Creates** specification, plan, and task breakdown
+7. **Implements** each feature using TDD
+8. **Reviews** code for security and quality
+9. **Delivers** complete project with tests
+
+**Result:** A production-ready project with 80%+ test coverage, security-reviewed code, and proper documentation.
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## 🚀 Quick Start
 
 ### Prerequisites
 
-Before you begin, make sure you have:
-
-1. **Claude Code CLI** - [Install here](https://docs.anthropic.com/en/docs/claude-code)
-   ```bash
-   # Check if installed
-   claude --version
-   ```
-
-2. **Node.js 18+** - [Install here](https://nodejs.org/)
-   ```bash
-   # Check version
-   node --version  # Should be v18 or higher
-   ```
-
-3. **Git** - [Install here](https://git-scm.com/)
-   ```bash
-   # Check if installed
-   git --version
-   ```
-
-### Step 1: Get the Template
-
-**Option A: Clone for a new project**
 ```bash
-git clone https://github.com/your-username/production-ready-claude-code.git my-project
+# Claude Code CLI
+claude --version
+
+# Node.js 18+
+node --version
+
+# Git
+git --version
+```
+
+### Installation
+
+```bash
+# Clone the boilerplate
+git clone https://github.com/your-username/autonomous-agent-boilerplate.git my-project
 cd my-project
-```
 
-**Option B: Add to existing project**
-```bash
-# Copy these folders/files to your project
-cp -r production-ready-claude-code/.claude your-project/
-cp production-ready-claude-code/CLAUDE.md your-project/
-cp production-ready-claude-code/.mcp.json your-project/
-```
-
-### Step 2: Configure API Keys (Optional)
-
-If you want GitHub integration or web scraping, edit `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "github": {
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_your_token_here"
-      }
-    }
-  }
-}
-```
-
-### Step 3: Start Using It!
-
-```bash
-cd my-project
+# Start Claude Code
 claude
 ```
 
-Then try your first command:
-```
-> /plan I want to add a user login feature
-```
+### Your First Autonomous Build
 
-**That's it!** Claude will create a detailed plan and wait for your approval.
+```bash
+# Create requirements file
+mkdir requirements
+cat > requirements/my-app.md << 'EOF'
+# My Todo App
+
+## Features
+- User registration and login
+- Create, edit, delete todos
+- Mark todos as complete
+
+## Technical
+- Frontend: React
+- Backend: Express
+- Database: SQLite
+EOF
+
+# Run autonomous mode
+claude "/sp.autonomous requirements/my-app.md"
+
+# Watch it build your entire project!
+```
 
 ---
 
-## 👶 For Absolute Beginners
+## ⚙️ The Spec-Kit-Plus Workflow
 
-### What is Claude Code?
-
-Claude Code is an AI coding assistant that runs in your **terminal** (command line). Unlike ChatGPT where you copy-paste code, Claude Code:
-
-- ✅ **Reads** your actual project files
-- ✅ **Understands** your project structure
-- ✅ **Edits** files directly (with your permission)
-- ✅ **Runs** commands for you
-- ✅ **Creates** new files when needed
-
-### What Does This Template Add?
-
-Think of this template as **training wheels + safety rails** for Claude Code:
+When you run `/sp.autonomous`, this workflow executes:
 
 ```
-Without Template:
-  You: "Add a login feature"
-  Claude: *immediately writes code*
-  You: *hopes it works*
-
-With Template:
-  You: "/plan Add a login feature"
-  Claude: "Here's my plan:
-           1. Create User model
-           2. Add auth routes
-           3. Create login form
-           ...
-           Do you approve?"
-  You: "Yes"
-  Claude: *writes tests first*
-  Claude: *implements code*
-  Claude: *runs tests*
-  Claude: *reviews for security*
-  You: *confident it works*
+┌───────────────────────────────────────────────────────────────────┐
+│                     SPEC-KIT-PLUS WORKFLOW                        │
+│                                                                   │
+│  BOOTSTRAP → ANALYZE → GENERATE → SPEC → PLAN → TASKS            │
+│                                                    ↓              │
+│                              DELIVER ← QA ← IMPLEMENT             │
+│                                                                   │
+└───────────────────────────────────────────────────────────────────┘
 ```
 
-### Your First 10 Minutes
+### Phase Details
 
-#### 1. Open your terminal and navigate to your project:
+| Phase | What Happens | Output |
+|-------|--------------|--------|
+| **BOOTSTRAP** | Create directories, init git, create branch | `.specify/`, `.claude/` |
+| **ANALYZE** | Parse requirements, detect tech stack | Technology map |
+| **GENERATE** | Create skills, agents, hooks for YOUR stack | Custom infrastructure |
+| **SPEC** | Generate detailed specification | `.specify/spec.md` |
+| **PLAN** | Create implementation plan | `.specify/plan.md` |
+| **TASKS** | Break down into actionable items | `.specify/tasks.md` |
+| **IMPLEMENT** | Build each feature with TDD | Source code + tests |
+| **QA** | Code review, test coverage, security check | Quality report |
+| **DELIVER** | Commit, generate report | Complete project |
+
+### What Gets Generated
+
+```
+your-project/
+│
+├── .specify/                      # Spec-Kit-Plus artifacts
+│   ├── spec.md                    # Detailed specification
+│   ├── plan.md                    # Implementation plan
+│   ├── data-model.md              # Database schema
+│   └── tasks.md                   # Task checklist [X] marked
+│
+├── .claude/
+│   ├── skills/                    # GENERATED for your tech stack
+│   │   ├── express-patterns/      # (if Express detected)
+│   │   ├── prisma-patterns/       # (if Prisma detected)
+│   │   └── react-patterns/        # (if React detected)
+│   │
+│   ├── agents/                    # GENERATED for your project
+│   │   ├── api-builder/           # (if API project)
+│   │   └── frontend-builder/      # (if frontend project)
+│   │
+│   ├── hooks/                     # GENERATED for your workflow
+│   │   ├── pre-commit.sh
+│   │   └── quality-gate.py
+│   │
+│   ├── logs/autonomous.log        # Build log
+│   └── build-reports/             # Final report
+│
+└── src/                           # YOUR PROJECT CODE
+    ├── (generated source files)
+    └── (generated test files)
+```
+
+---
+
+## 📝 Writing Requirements
+
+### Minimal Requirements File
+
+```markdown
+# Project Name
+
+## Features
+- Feature 1
+- Feature 2
+
+## Technical
+- Stack item 1
+- Stack item 2
+```
+
+### Comprehensive Requirements File
+
+```markdown
+# E-Commerce Platform
+
+## Overview
+A full-featured e-commerce platform for small businesses.
+
+## Features
+
+### User Management
+- User registration with email verification
+- Login with JWT authentication
+- Password reset flow
+- User profile management
+
+### Product Catalog
+- Product CRUD operations
+- Category management
+- Search with filters
+- Image upload
+
+### Shopping Cart
+- Add/remove items
+- Quantity management
+- Persistent cart (database)
+
+### Orders
+- Checkout flow
+- Order history
+- Order status tracking
+
+## Technical
+
+### Backend
+- Runtime: Node.js 20
+- Framework: Express
+- Database: PostgreSQL
+- ORM: Prisma
+- Auth: JWT + bcrypt
+
+### Frontend
+- Framework: Next.js 14
+- Styling: Tailwind CSS
+- State: Zustand
+
+### Testing
+- Unit: Jest
+- E2E: Playwright
+
+### Deployment
+- Docker
+- Railway/Vercel
+
+## Constraints
+- Must be mobile-responsive
+- Must support 1000 concurrent users
+- Must have 80%+ test coverage
+```
+
+---
+
+## 📦 Pre-Loaded Components
+
+The boilerplate comes with pre-loaded components that work out of the box:
+
+### Agents (10)
+
+| Agent | Purpose |
+|-------|---------|
+| **planner** | Creates implementation plans |
+| **architect** | System design decisions |
+| **tdd-guide** | Test-driven development |
+| **code-reviewer** | Quality & security review |
+| **security-reviewer** | OWASP Top 10 checks |
+| **build-error-resolver** | Fix build errors |
+| **e2e-runner** | Playwright E2E tests |
+| **refactor-cleaner** | Remove dead code |
+| **doc-updater** | Update documentation |
+| **test-runner** | Run tests |
+
+### Skills (8)
+
+| Skill | What It Contains |
+|-------|------------------|
+| **coding-standards** | TypeScript/JS/React patterns |
+| **backend-patterns** | API design, services |
+| **testing-patterns** | Jest/Vitest/Playwright |
+| **api-patterns** | REST/GraphQL design |
+| **database-patterns** | Prisma/SQL/migrations |
+| **claudeception** | Session learning |
+| **mcp-code-execution** | MCP integration |
+| **skill-gap-analyzer** | Detect missing skills |
+
+### Commands (10)
+
+| Command | What It Does |
+|---------|--------------|
+| `/sp.autonomous` | **Full autonomous build** |
+| `/plan` | Create implementation plan |
+| `/tdd` | Test-driven development |
+| `/code-review` | Security + quality review |
+| `/build-fix` | Fix build errors |
+| `/e2e` | E2E testing |
+| `/refactor-clean` | Remove dead code |
+| `/test-coverage` | Check coverage |
+| `/update-codemaps` | Update architecture docs |
+| `/update-docs` | Sync documentation |
+
+---
+
+## 🔧 Manual Mode (Optional)
+
+Don't want full autonomous mode? Use individual commands:
+
+### Planning Workflow
+
 ```bash
-cd my-project
-```
+# Start with a plan
+> /plan I want to add user authentication
 
-#### 2. Start Claude Code:
-```bash
-claude
-```
+# Claude creates plan, WAITS for approval
+> looks good, proceed
 
-You'll see a prompt like:
-```
-Claude Code v1.x.x
-Type your message or use /help for commands
->
-```
-
-#### 3. Try the `/plan` command:
-```
-> /plan I want to add a contact form that sends emails
-```
-
-#### 4. Read Claude's plan:
-Claude will show you:
-- What files will be created
-- What dependencies are needed
-- Potential risks
-- Step-by-step implementation
-
-#### 5. Approve or modify:
-```
-> Looks good, proceed
-```
-OR
-```
-> Can you also add form validation?
-```
-
-#### 6. Watch Claude work:
-Claude will:
-1. Write tests first (TDD)
-2. Implement the feature
-3. Run the tests
-4. Review for security issues
-
-#### 7. Review the code:
-```
+# Claude implements with TDD
+# Then review
 > /code-review
-```
 
-#### 8. Commit when ready:
-```
+# Fix any issues
+> /build-fix
+
+# Commit
 > commit these changes
 ```
 
----
+### TDD Workflow
 
-## 📝 Available Commands
+```bash
+> /tdd
 
-Type these in Claude Code to trigger specialized workflows:
-
-### 🎯 Planning Commands
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `/plan` | Creates implementation plan, waits for approval | `/plan Add dark mode` |
-| `/update-codemaps` | Generates architecture docs | `/update-codemaps` |
-| `/update-docs` | Syncs README and guides | `/update-docs` |
-
-### 💻 Development Commands
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `/tdd` | Test-driven development | `/tdd` |
-| `/build-fix` | Fixes build errors one at a time | `/build-fix` |
-| `/refactor-clean` | Removes unused code safely | `/refactor-clean` |
-
-### ✅ Quality Commands
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `/code-review` | Security + quality check | `/code-review` |
-| `/test-coverage` | Checks and improves coverage | `/test-coverage` |
-| `/e2e` | Creates Playwright E2E tests | `/e2e test login flow` |
-
-### 🤖 Autonomous Command (Spec-Kit-Plus)
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `/sp.autonomous` | Builds entire project using Spec-Kit-Plus workflow | `/sp.autonomous requirements/app.md` |
-
-> **Spec-Kit-Plus**: A structured workflow that generates specs, plans, tasks, then implements with full TDD and quality gates. See [Autonomous Mode](#-autonomous-mode-spec-kit-plus-workflow) for details.
-
----
-
-## 🔄 The Recommended Workflow
-
-Follow this workflow for best results:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│   STEP 1: PLAN                                                  │
-│   ─────────────────                                             │
-│   > /plan I want to add [your feature]                          │
-│                                                                 │
-│   Claude will:                                                  │
-│   • Analyze what's needed                                       │
-│   • List files to create/modify                                 │
-│   • Identify risks                                              │
-│   • WAIT for your approval                                      │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   STEP 2: APPROVE                                               │
-│   ─────────────────                                             │
-│   > looks good, proceed                                         │
-│   OR                                                            │
-│   > modify: also add input validation                           │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   STEP 3: TDD IMPLEMENTATION                                    │
-│   ─────────────────                                             │
-│   Claude automatically:                                         │
-│   1. Writes failing tests (RED)                                 │
-│   2. Implements code to pass (GREEN)                            │
-│   3. Refactors for quality (REFACTOR)                           │
-│   4. Ensures 80%+ coverage                                      │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   STEP 4: CODE REVIEW                                           │
-│   ─────────────────                                             │
-│   > /code-review                                                │
-│                                                                 │
-│   Claude checks:                                                │
-│   • Security vulnerabilities                                    │
-│   • Code quality issues                                         │
-│   • Best practice violations                                    │
-│   • Performance problems                                        │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   STEP 5: FIX (if needed)                                       │
-│   ─────────────────                                             │
-│   > /build-fix     (if build fails)                             │
-│   > fix the security issues found                               │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   STEP 6: COMMIT                                                │
-│   ─────────────────                                             │
-│   > commit with message "feat: add contact form"                │
-│                                                                 │
-│   Hooks automatically:                                          │
-│   • Check for console.log statements                            │
-│   • Pause for final review                                      │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+# Claude:
+# 1. Writes failing test (RED)
+# 2. Implements code (GREEN)
+# 3. Refactors (IMPROVE)
+# 4. Verifies 80%+ coverage
 ```
 
 ---
@@ -346,261 +380,110 @@ Follow this workflow for best results:
 ## 📁 Understanding the Structure
 
 ```
-your-project/
+autonomous-agent-boilerplate/
 │
-├── CLAUDE.md                    # Instructions for Claude (READ THIS)
-├── .mcp.json                    # MCP server configuration
+├── CLAUDE.md                      # Instructions for Claude
+├── .mcp.json                      # MCP server configuration
 │
-└── .claude/                     # All Claude Code configuration
+└── .claude/
+    ├── settings.json              # Permissions
+    ├── hooks.json                 # 10 automation hooks
     │
-    ├── settings.json            # Permissions and environment
-    ├── hooks.json               # Automation hooks
-    │
-    ├── agents/                  # 10 Specialized AI Assistants
-    │   ├── planner.md           # Creates implementation plans
-    │   ├── architect.md         # System design decisions
-    │   ├── tdd-guide.md         # Test-driven development
-    │   ├── code-reviewer.md     # Quality & security review
-    │   ├── security-reviewer.md # Deep security analysis
-    │   ├── build-error-resolver.md # Fix build errors
-    │   ├── e2e-runner.md        # Playwright E2E tests
-    │   ├── refactor-cleaner.md  # Remove dead code
-    │   ├── doc-updater.md       # Update documentation
-    │   └── test-runner.md       # Run tests
-    │
-    ├── commands/                # 10 Slash Commands
-    │   ├── plan.md              # /plan
-    │   ├── tdd.md               # /tdd
-    │   ├── code-review.md       # /code-review
-    │   ├── build-fix.md         # /build-fix
-    │   ├── e2e.md               # /e2e
-    │   ├── refactor-clean.md    # /refactor-clean
-    │   ├── test-coverage.md     # /test-coverage
-    │   ├── update-codemaps.md   # /update-codemaps
-    │   ├── update-docs.md       # /update-docs
-    │   └── sp.autonomous.md     # /sp.autonomous
-    │
-    ├── rules/                   # 8 Governance Files
-    │   ├── security.md          # Security requirements
-    │   ├── testing.md           # Testing requirements
-    │   ├── coding-style.md      # Code style rules
-    │   ├── git-workflow.md      # Git conventions
-    │   ├── agents.md            # Agent usage rules
-    │   ├── patterns.md          # Code patterns
-    │   ├── performance.md       # Performance rules
-    │   └── hooks.md             # Hook documentation
-    │
-    └── skills/                  # Reusable Knowledge (8 Skills)
-        ├── coding-standards/    # TypeScript/JS/React standards
-        ├── backend-patterns/    # API design, services
-        ├── testing-patterns/    # Jest/Vitest/Playwright patterns
-        ├── api-patterns/        # REST/GraphQL design
-        ├── database-patterns/   # Prisma/SQL/migrations
-        ├── claudeception/       # Session learning extraction
-        ├── mcp-code-execution/  # MCP integration pattern
-        └── skill-gap-analyzer/  # Auto-detect missing skills
+    ├── agents/                    # 10 pre-loaded agents
+    ├── commands/                  # 10 slash commands
+    ├── rules/                     # 8 governance rules
+    └── skills/                    # 8 pre-loaded skills
+```
+
+### Rules Enforced
+
+| Rule | Enforcement |
+|------|-------------|
+| **Immutability** | No direct mutation allowed |
+| **File Size** | Max 800 lines per file |
+| **Test Coverage** | Minimum 80% |
+| **Security** | OWASP Top 10 checked |
+| **Code Quality** | Auto-formatted, reviewed |
+
+---
+
+## 🎨 Customization
+
+### Add Your Own Skills
+
+Create `.claude/skills/my-skill/SKILL.md`:
+
+```markdown
+---
+name: my-skill
+description: Description of what this skill does
+allowed-tools: Read, Write, Edit, Bash
+---
+
+# My Custom Skill
+
+## Patterns
+...
+```
+
+### Add Your Own Agents
+
+Create `.claude/agents/my-agent.md`:
+
+```markdown
+---
+name: my-agent
+description: What this agent does
+tools: Read, Write, Edit, Bash
+model: sonnet
+---
+
+Instructions for the agent...
+```
+
+### Add Your Own Commands
+
+Create `.claude/commands/my-command.md`:
+
+```markdown
+---
+description: What this command does
+---
+
+Instructions executed when /my-command is called...
 ```
 
 ---
 
-## 🤖 Agents Explained
+## 🔧 Troubleshooting
 
-Agents are specialized AI assistants. Each one has a specific job:
+### "Command not found"
 
-### Planning & Design
-
-| Agent | Trigger | What It Does |
-|-------|---------|--------------|
-| **planner** | `/plan` | Creates step-by-step implementation plans |
-| **architect** | Complex design | System architecture, ADRs, scalability |
-
-### Development
-
-| Agent | Trigger | What It Does |
-|-------|---------|--------------|
-| **tdd-guide** | `/tdd` | Enforces test-first development |
-| **build-error-resolver** | `/build-fix` | Fixes errors one at a time |
-| **refactor-cleaner** | `/refactor-clean` | Removes unused code safely |
-
-### Quality Assurance
-
-| Agent | Trigger | What It Does |
-|-------|---------|--------------|
-| **code-reviewer** | `/code-review` | Security + quality checks |
-| **security-reviewer** | Sensitive code | OWASP Top 10 checks |
-| **test-runner** | After code | Runs tests, reports coverage |
-| **e2e-runner** | `/e2e` | Playwright browser tests |
-
-### Documentation
-
-| Agent | Trigger | What It Does |
-|-------|---------|--------------|
-| **doc-updater** | `/update-docs` | Keeps docs in sync with code |
-
----
-
-## 🧠 Skills Explained
-
-Skills are **reusable knowledge libraries** that Claude consults when working on specific types of tasks. They contain patterns, best practices, and code examples.
-
-### Development Skills
-
-| Skill | What It Contains | When Used |
-|-------|------------------|-----------|
-| **coding-standards** | TypeScript/JS/React patterns, naming conventions, immutability | All code writing |
-| **backend-patterns** | API design, services, repository pattern | Backend development |
-| **api-patterns** | REST/GraphQL design, authentication, rate limiting | Building APIs |
-| **database-patterns** | Prisma ORM, SQL, migrations, N+1 prevention | Database work |
-
-### Testing Skills
-
-| Skill | What It Contains | When Used |
-|-------|------------------|-----------|
-| **testing-patterns** | Jest/Vitest/Playwright patterns, mocking, AAA pattern | Writing tests |
-
-### Meta Skills
-
-| Skill | What It Contains | When Used |
-|-------|------------------|-----------|
-| **claudeception** | Extract learnings from sessions | After complex debugging |
-| **mcp-code-execution** | MCP integration patterns | Building MCP tools |
-| **skill-gap-analyzer** | Detect missing skills for project | Project setup |
-
-### How Skills Work
-
-1. **Automatic Detection**: When you start a task, Claude checks which skills apply
-2. **Pattern Loading**: Relevant patterns are loaded into context
-3. **Consistent Code**: Claude follows the loaded patterns for consistency
-
-### Example: Building an API
-
-```
-> /plan Create a REST API for user management
-
-# Claude detects:
-# - api-patterns (REST design)
-# - database-patterns (Prisma ORM)
-# - coding-standards (TypeScript)
-# - testing-patterns (for tests)
-
-# All patterns are loaded, ensuring:
-# - Proper HTTP status codes
-# - Zod validation
-# - Cursor-based pagination
-# - 80% test coverage
+```bash
+ls .claude/commands/
+# Should show plan.md, tdd.md, sp.autonomous.md, etc.
 ```
 
----
+**Fix:** Ensure `.claude/` folder is in your project.
 
-## 📏 Rules & Best Practices
+### "Build fails repeatedly"
 
-The template enforces these standards **automatically**:
-
-### Rule 1: Immutability (CRITICAL)
-
-**Always create new objects, never modify existing ones.**
-
-```typescript
-// ❌ WRONG - Direct mutation (BLOCKED)
-user.name = 'New Name'
-array.push(item)
-object.property = value
-
-// ✅ CORRECT - Immutable patterns (REQUIRED)
-const updatedUser = { ...user, name: 'New Name' }
-const newArray = [...array, item]
-const newObject = { ...object, property: value }
+```bash
+> /build-fix
 ```
 
-**Why?** Prevents bugs, enables undo/redo, better for React.
+Self-heals up to 3 times, then asks for help.
 
-### Rule 2: File Size Limits
+### "MCP server error"
 
-| Metric | Guideline | Maximum |
-|--------|-----------|---------|
-| Lines per file | 200-400 | 800 |
-| Function length | 20-30 | 50 |
-| Nesting depth | 2-3 | 4 |
-
-**Why?** Easier to read, test, and maintain.
-
-### Rule 3: Test Coverage
-
-| Code Type | Minimum Coverage |
-|-----------|------------------|
-| Regular code | 80% |
-| Financial code | 100% |
-| Authentication code | 100% |
-| Security-critical code | 100% |
-
-### Rule 4: Security Checklist
-
-Every commit is checked for:
-- ❌ Hardcoded secrets (API keys, passwords)
-- ❌ SQL injection vulnerabilities
-- ❌ XSS (Cross-Site Scripting) vulnerabilities
-- ❌ Missing input validation
-- ❌ Outdated dependencies with known vulnerabilities
-
----
-
-## ⚡ Hooks (Automation)
-
-Hooks run automatically to prevent mistakes and maintain quality:
-
-### Prevention Hooks (Before Actions)
-
-| Hook | What It Does | Why |
-|------|--------------|-----|
-| Dev Server Blocker | Blocks `npm run dev` outside tmux | Ensures you can see logs |
-| Doc File Blocker | Blocks random .md file creation | Keeps docs organized |
-| Git Push Review | Pauses before push | Final review chance |
-
-### Auto-Fix Hooks (After Actions)
-
-| Hook | What It Does | Why |
-|------|--------------|-----|
-| Prettier | Auto-formats JS/TS files | Consistent code style |
-| TypeScript Check | Type-checks after edits | Catch errors early |
-| Console.log Warning | Warns about debug logs | Clean production code |
-
-### Audit Hooks (Session End)
-
-| Hook | What It Does | Why |
-|------|--------------|-----|
-| Console.log Audit | Final check for debug logs | Last safety net |
-| PR Logger | Shows PR URL after creation | Easy access |
-
----
-
-## 🔌 MCP Servers
-
-MCP (Model Context Protocol) gives Claude extra capabilities:
-
-| Server | What It Does | How to Use |
-|--------|--------------|------------|
-| **filesystem** | Read/write files | Built-in, always available |
-| **github** | GitHub API (PRs, issues) | Set `GITHUB_PERSONAL_ACCESS_TOKEN` |
-| **memory** | Remember across sessions | Automatic |
-| **sequential-thinking** | Better reasoning | Automatic |
-| **firecrawl** | Web scraping | Set `FIRECRAWL_API_KEY` |
-| **context7** | Live documentation | Automatic |
-
-### Setting Up API Keys
-
-Edit `.mcp.json`:
+Check `.mcp.json` has correct API keys:
 
 ```json
 {
   "mcpServers": {
     "github": {
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxxxxxxxxxxx"
-      }
-    },
-    "firecrawl": {
-      "env": {
-        "FIRECRAWL_API_KEY": "fc_xxxxxxxxxxxx"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token"
       }
     }
   }
@@ -609,335 +492,34 @@ Edit `.mcp.json`:
 
 ---
 
-## 💡 Step-by-Step Examples
-
-### Example 1: Adding a New Feature
-
-```bash
-# Start Claude Code
-$ claude
-
-# Plan the feature
-> /plan I want to add a dark mode toggle to my React app
-
-# Claude outputs:
-# Implementation Plan: Dark Mode Toggle
-#
-# Files to create:
-# - src/hooks/useDarkMode.ts
-# - src/components/DarkModeToggle.tsx
-#
-# Files to modify:
-# - src/app/layout.tsx
-# - tailwind.config.js
-#
-# Dependencies: none
-#
-# Risks: LOW
-#
-# Do you approve this plan?
-
-> yes, proceed
-
-# Claude writes tests first...
-# Claude implements the feature...
-# Claude runs tests...
-
-# Review the code
-> /code-review
-
-# Claude checks for issues...
-# No CRITICAL or HIGH issues found.
-
-# Commit
-> commit with message "feat: add dark mode toggle"
-```
-
-### Example 2: Fixing a Bug
-
-```bash
-$ claude
-
-> /plan Fix the login form - it doesn't submit when pressing Enter
-
-# Claude analyzes the issue and creates a plan...
-
-> proceed
-
-# Claude writes a test that reproduces the bug
-# Test fails (proving the bug exists)
-# Claude implements the fix
-# Test passes (proving the fix works)
-
-> /code-review
-
-# All checks pass
-
-> commit with message "fix: login form submits on Enter key"
-```
-
-### Example 3: Building an Entire Project
-
-```bash
-$ claude
-
-> /sp.autonomous requirements/my-app.md
-
-# Claude reads your requirements file
-# Creates all necessary files
-# Writes tests
-# Implements features
-# Reviews code
-# Commits everything
-# All without asking questions!
-```
-
----
-
-## 🤖 Autonomous Mode (Spec-Kit-Plus Workflow)
-
-For fully autonomous project building, use `/sp.autonomous`. This command follows the **Spec-Kit-Plus** workflow - a structured approach to building complete projects from requirements.
-
-### The Spec-Kit-Plus Workflow
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    SPEC-KIT-PLUS WORKFLOW                       │
-│                                                                 │
-│  BOOTSTRAP → ANALYZE → GENERATE → SPEC → PLAN → TASKS →       │
-│  IMPLEMENT → QA → DELIVER                                       │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-
-1. BOOTSTRAP
-   └── Create .specify/ and .claude/ directories
-   └── Initialize git, create feature branch
-
-2. ANALYZE REQUIREMENTS
-   └── Parse requirements file
-   └── Detect project type, technologies, features
-
-3. GENERATE INFRASTRUCTURE
-   └── Generate skills for detected technologies
-   └── Generate subagents (code-reviewer, test-runner)
-   └── Generate hooks (pre-commit, quality-gate)
-
-4. SPEC → PLAN → TASKS
-   └── .specify/spec.md (detailed specification)
-   └── .specify/plan.md (implementation plan)
-   └── .specify/data-model.md (database schema)
-   └── .specify/tasks.md (checklist of tasks)
-
-5. IMPLEMENT
-   └── Execute each task using appropriate skill
-   └── Validate after each task
-   └── Self-heal on failures (max 3 retries)
-
-6. QUALITY ASSURANCE
-   └── Code review (must pass)
-   └── Tests (80%+ coverage required)
-   └── App verification
-
-7. DELIVER
-   └── Git commit with comprehensive message
-   └── Generate build report in .claude/build-reports/
-```
-
-### Directory Structure Created
-
-```
-your-project/
-├── .specify/                    # Spec-Kit-Plus artifacts
-│   ├── templates/               # Specification templates
-│   ├── scripts/bash/            # Build scripts
-│   ├── contracts/               # API contracts
-│   ├── spec.md                  # Generated specification
-│   ├── plan.md                  # Implementation plan
-│   ├── data-model.md            # Database schema
-│   └── tasks.md                 # Task checklist
-│
-└── .claude/
-    ├── skills/                  # Generated skills
-    ├── agents/                  # Generated subagents
-    ├── hooks/                   # Generated hooks
-    ├── logs/autonomous.log      # Build log
-    └── build-reports/           # Final reports
-```
-
-### Create a Requirements File
-
-Create `requirements/my-app.md`:
-
-```markdown
-# My Todo App
-
-## Overview
-A simple todo list application with user accounts.
-
-## Features
-- User registration and login
-- Create, edit, delete todos
-- Mark todos as complete
-- Filter by status (all, active, completed)
-
-## Technical
-- Frontend: Next.js
-- Backend: Express
-- Database: PostgreSQL
-```
-
-### Run Autonomous Mode
-
-```bash
-$ claude "/sp.autonomous requirements/my-app.md"
-```
-
-Claude will execute the full Spec-Kit-Plus workflow:
-1. **Bootstrap** - Set up project structure
-2. **Analyze** - Parse requirements, detect technologies
-3. **Generate** - Create skills, agents, hooks for your stack
-4. **Spec** - Generate detailed specification
-5. **Plan** - Create implementation plan
-6. **Tasks** - Break down into actionable items
-7. **Implement** - Build each feature with TDD
-8. **QA** - Review code, run tests (80%+ coverage)
-9. **Deliver** - Commit and generate report
-
-**No human intervention needed!**
-
----
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### "Command not found: /plan"
-
-```bash
-# Check if commands folder exists
-ls .claude/commands/
-# Should show: plan.md, tdd.md, etc.
-```
-
-**Fix:** Copy the `.claude` folder from this template to your project.
-
-#### "Agent not responding"
-
-```bash
-# Check if agents folder exists
-ls .claude/agents/
-# Should show: planner.md, tdd-guide.md, etc.
-```
-
-**Fix:** Copy the `.claude` folder from this template to your project.
-
-#### "Hooks not running"
-
-```bash
-# Validate hooks.json
-cat .claude/hooks.json | python -m json.tool
-```
-
-**Fix:** Check for JSON syntax errors in `.claude/hooks.json`.
-
-#### "Build fails repeatedly"
-
-```bash
-> /build-fix
-```
-
-If it fails 3 times on the same error, Claude will stop and ask for help.
-
-#### "MCP server connection failed"
-
-1. Check your API key is set in `.mcp.json`
-2. Try running the server manually:
-   ```bash
-   npx -y @modelcontextprotocol/server-github
-   ```
-
----
-
 ## ❓ FAQ
 
-### Q: Do I need to pay for Claude Code?
+### Q: What's the difference between this and a normal template?
 
-A: Claude Code requires a Claude API key or Claude Pro subscription. Check [Anthropic's pricing](https://anthropic.com/pricing).
+**Normal template:** Pre-made files you adapt to your project.
+**This boilerplate:** Generates custom infrastructure for YOUR specific requirements.
 
-### Q: Can I customize the rules?
+### Q: Do I need to write detailed requirements?
 
-A: Yes! Edit files in `.claude/rules/`. For example, to change the file size limit, edit `.claude/rules/coding-style.md`.
+Minimal requirements work, but more detail = better results. The boilerplate extracts technologies, features, and constraints from your requirements file.
 
-### Q: Can I add my own commands?
+### Q: Can I use this for existing projects?
 
-A: Yes! Create a new `.md` file in `.claude/commands/`. Follow the format of existing commands.
+Yes! Copy `.claude/`, `CLAUDE.md`, and `.mcp.json` to your project. Then use `/plan` for new features.
 
-### Q: Can I use this with JavaScript instead of TypeScript?
+### Q: What if autonomous mode fails?
 
-A: Yes! The rules apply to both. TypeScript is recommended but not required.
+It self-heals up to 3 times. If still failing, it stops and reports what went wrong. You can then use manual commands (`/plan`, `/tdd`, `/build-fix`) to continue.
 
-### Q: Why does Claude wait for approval after /plan?
+### Q: Can I customize the generated code style?
 
-A: This prevents wasted effort. If the plan is wrong, it's easier to fix before coding starts.
-
-### Q: Can I skip the planning step?
-
-A: Yes, just ask Claude directly: "Add a login feature". But you'll miss the safety benefits.
-
-### Q: How do I update this template?
-
-A: Pull the latest changes:
-```bash
-git pull origin main
-```
-
----
-
-## 🎓 Tips for Success
-
-### Do's ✅
-
-1. **Always start with `/plan`** for non-trivial features
-2. **Trust the TDD process** - tests first, then code
-3. **Run `/code-review`** before every commit
-4. **Use immutable patterns** - spread operator always
-5. **Keep files small** - 200-400 lines is ideal
-6. **Read the plan carefully** before approving
-
-### Don'ts ❌
-
-1. **Don't skip planning** - it saves time overall
-2. **Don't ignore code review** - security issues hide here
-3. **Don't mutate state** - always create new objects
-4. **Don't write huge files** - split into modules
-5. **Don't leave console.log** - hooks will catch you
-6. **Don't approve without reading** - plans can be wrong
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how:
-
-1. **Fork** this repository
-2. **Create** a feature branch
-3. **Use** `/plan` to document your changes
-4. **Run** `/code-review` before submitting
-5. **Create** a PR with clear description
-
-### Areas for Contribution
-
-- New agents for specific use cases
-- Additional rules for frameworks
-- Hook improvements
-- Documentation improvements
-- Bug fixes
+Yes! Edit `.claude/rules/coding-style.md` to change patterns, file size limits, naming conventions, etc.
 
 ---
 
 ## 📄 License
 
-MIT License - feel free to use this template in your projects, personal or commercial.
+MIT License - use freely in personal and commercial projects.
 
 ---
 
@@ -945,14 +527,10 @@ MIT License - feel free to use this template in your projects, personal or comme
 
 - Inspired by [everything-claude-code](https://github.com/affaan-m/everything-claude-code) by [@affaan-m](https://github.com/affaan-m)
 - Built for [Claude Code](https://claude.ai/claude-code) by Anthropic
-- Community feedback and contributions welcome
 
 ---
 
 <p align="center">
-  <b>Happy Coding! 🚀</b><br><br>
-  <i>Let Claude handle the complexity while you focus on creativity.</i><br><br>
-  <a href="https://github.com/your-username/production-ready-claude-code/issues">Report Bug</a>
-  ·
-  <a href="https://github.com/your-username/production-ready-claude-code/issues">Request Feature</a>
+  <b>Write requirements. Run one command. Ship code.</b><br><br>
+  <code>claude "/sp.autonomous requirements/my-app.md"</code>
 </p>
