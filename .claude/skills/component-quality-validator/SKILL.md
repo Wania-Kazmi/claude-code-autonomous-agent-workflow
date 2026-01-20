@@ -1,3 +1,19 @@
+---
+name: component-quality-validator
+description: |
+  Validates that generated skills, agents, and hooks are production-ready before use.
+  Scores components against quality criteria and grades them A-F.
+  Triggers: validate component, quality check, production ready, component validation,
+  skill quality, agent quality, hook quality, phase 6.5
+version: 1.0.0
+author: Claude Code
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash
+---
+
 # Component Quality Validator
 
 Validates that generated skills, agents, and hooks are **production-ready** before use.
