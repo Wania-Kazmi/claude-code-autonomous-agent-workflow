@@ -1,6 +1,6 @@
 # Production-Ready Claude Code Template
 
-> 🏆 **Battle-tested configuration from hackathon winner.** Pre-configured agents, commands, hooks, and rules for high-quality software development with Claude Code.
+> **Production-ready configuration for Claude Code.** Pre-configured agents, commands, hooks, skills, and rules for high-quality software development.
 
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Ready-blue)](https://claude.ai/claude-code)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -264,11 +264,13 @@ Type these in Claude Code to trigger specialized workflows:
 | `/test-coverage` | Checks and improves coverage | `/test-coverage` |
 | `/e2e` | Creates Playwright E2E tests | `/e2e test login flow` |
 
-### 🤖 Autonomous Command
+### 🤖 Autonomous Command (Spec-Kit-Plus)
 
 | Command | What It Does | Example |
 |---------|--------------|---------|
-| `/sp.autonomous` | Builds entire project from requirements | `/sp.autonomous requirements/app.md` |
+| `/sp.autonomous` | Builds entire project using Spec-Kit-Plus workflow | `/sp.autonomous requirements/app.md` |
+
+> **Spec-Kit-Plus**: A structured workflow that generates specs, plans, tasks, then implements with full TDD and quality gates. See [Autonomous Mode](#-autonomous-mode-spec-kit-plus-workflow) for details.
 
 ---
 
@@ -692,9 +694,75 @@ $ claude
 
 ---
 
-## 🤖 Autonomous Mode
+## 🤖 Autonomous Mode (Spec-Kit-Plus Workflow)
 
-For fully autonomous project building, use `/sp.autonomous`:
+For fully autonomous project building, use `/sp.autonomous`. This command follows the **Spec-Kit-Plus** workflow - a structured approach to building complete projects from requirements.
+
+### The Spec-Kit-Plus Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SPEC-KIT-PLUS WORKFLOW                       │
+│                                                                 │
+│  BOOTSTRAP → ANALYZE → GENERATE → SPEC → PLAN → TASKS →       │
+│  IMPLEMENT → QA → DELIVER                                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+1. BOOTSTRAP
+   └── Create .specify/ and .claude/ directories
+   └── Initialize git, create feature branch
+
+2. ANALYZE REQUIREMENTS
+   └── Parse requirements file
+   └── Detect project type, technologies, features
+
+3. GENERATE INFRASTRUCTURE
+   └── Generate skills for detected technologies
+   └── Generate subagents (code-reviewer, test-runner)
+   └── Generate hooks (pre-commit, quality-gate)
+
+4. SPEC → PLAN → TASKS
+   └── .specify/spec.md (detailed specification)
+   └── .specify/plan.md (implementation plan)
+   └── .specify/data-model.md (database schema)
+   └── .specify/tasks.md (checklist of tasks)
+
+5. IMPLEMENT
+   └── Execute each task using appropriate skill
+   └── Validate after each task
+   └── Self-heal on failures (max 3 retries)
+
+6. QUALITY ASSURANCE
+   └── Code review (must pass)
+   └── Tests (80%+ coverage required)
+   └── App verification
+
+7. DELIVER
+   └── Git commit with comprehensive message
+   └── Generate build report in .claude/build-reports/
+```
+
+### Directory Structure Created
+
+```
+your-project/
+├── .specify/                    # Spec-Kit-Plus artifacts
+│   ├── templates/               # Specification templates
+│   ├── scripts/bash/            # Build scripts
+│   ├── contracts/               # API contracts
+│   ├── spec.md                  # Generated specification
+│   ├── plan.md                  # Implementation plan
+│   ├── data-model.md            # Database schema
+│   └── tasks.md                 # Task checklist
+│
+└── .claude/
+    ├── skills/                  # Generated skills
+    ├── agents/                  # Generated subagents
+    ├── hooks/                   # Generated hooks
+    ├── logs/autonomous.log      # Build log
+    └── build-reports/           # Final reports
+```
 
 ### Create a Requirements File
 
@@ -724,13 +792,16 @@ A simple todo list application with user accounts.
 $ claude "/sp.autonomous requirements/my-app.md"
 ```
 
-Claude will:
-1. Analyze requirements
-2. Create project structure
-3. Write all code
-4. Write all tests
-5. Review for quality
-6. Commit the result
+Claude will execute the full Spec-Kit-Plus workflow:
+1. **Bootstrap** - Set up project structure
+2. **Analyze** - Parse requirements, detect technologies
+3. **Generate** - Create skills, agents, hooks for your stack
+4. **Spec** - Generate detailed specification
+5. **Plan** - Create implementation plan
+6. **Tasks** - Break down into actionable items
+7. **Implement** - Build each feature with TDD
+8. **QA** - Review code, run tests (80%+ coverage)
+9. **Deliver** - Commit and generate report
 
 **No human intervention needed!**
 
@@ -872,9 +943,9 @@ MIT License - feel free to use this template in your projects, personal or comme
 
 ## 🙏 Acknowledgments
 
+- Inspired by [everything-claude-code](https://github.com/affaan-m/everything-claude-code) by [@affaan-m](https://github.com/affaan-m)
 - Built for [Claude Code](https://claude.ai/claude-code) by Anthropic
-- Patterns refined through real-world hackathon projects
-- Community feedback and contributions welcome!
+- Community feedback and contributions welcome
 
 ---
 
