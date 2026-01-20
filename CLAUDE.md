@@ -6,6 +6,15 @@
 
 ## Quick Reference: Available Commands
 
+### Autonomous Workflow
+| Command | What It Does |
+|---------|--------------|
+| `/sp.autonomous` | **Full autonomous build** from requirements file |
+| `/q-status` | Check workflow state - which phase you're at |
+| `/q-validate` | Validate workflow order, detect skipped phases |
+| `/q-reset` | Reset workflow state (clear .specify/) |
+
+### Development Commands
 | Command | What It Does |
 |---------|--------------|
 | `/plan` | Create implementation plan, WAIT for approval |

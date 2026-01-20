@@ -5,7 +5,7 @@ description: |
   Enforces MCP Code Execution pattern for skills that use external tools.
   This skill should be used when starting a new project to ensure all required skills exist.
 author: Claude Code
-version: 2.0.0
+version: 2.1.0
 mcp-pattern: enforced
 allowed-tools:
   - Read
@@ -19,6 +19,51 @@ allowed-tools:
 
 Automatically identifies and creates missing skills based on project requirements.
 **Enforces MCP Code Execution pattern** for token efficiency when skills use external tools.
+
+---
+
+## MANDATORY EXECUTION STEPS
+
+When this skill is invoked, you MUST execute these steps IN ORDER:
+
+### Step A: Read Requirements File
+```
+Read the requirements file passed as argument
+```
+
+### Step B: Detect Technologies
+Scan for these keywords and mark detected:
+
+| Technology | Keywords to Search |
+|------------|-------------------|
+| React | "react", "jsx", "component" |
+| Next.js | "next.js", "nextjs", "next" |
+| Express | "express", "node api", "nodejs backend" |
+| FastAPI | "fastapi", "python api", "uvicorn" |
+| PostgreSQL | "postgresql", "postgres", "pg" |
+| MongoDB | "mongodb", "mongo", "mongoose" |
+| Prisma | "prisma", "orm" |
+| Docker | "docker", "container", "dockerfile" |
+| TypeScript | "typescript", "ts", ".tsx" |
+| Jest | "jest", "test", "testing" |
+| Playwright | "playwright", "e2e", "end-to-end" |
+
+### Step C: List Existing Skills
+```bash
+ls -la .claude/skills/
+```
+
+### Step D: Create Missing Skills
+For EACH detected technology that doesn't have a skill:
+
+1. Create directory: `mkdir -p .claude/skills/{tech}-patterns`
+2. Create SKILL.md with the template below
+3. Add technology-specific content
+
+### Step E: Generate Report
+Create `.specify/skill-gap-report.json` with results
+
+---
 
 ## Core Workflow
 

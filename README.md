@@ -5,7 +5,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Ready-blue)](https://claude.ai/claude-code)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Autonomous](https://img.shields.io/badge/Autonomous-Spec--Kit--Plus-purple)](.)
-[![Validated](https://img.shields.io/badge/Components-46%2F46-brightgreen)](.)
+[![Validated](https://img.shields.io/badge/Components-50%2F50-brightgreen)](.)
 
 ---
 
@@ -40,6 +40,10 @@ claude "/sp.autonomous requirements/my-app.md"
 - [How It Works](#-how-it-works)
 - [Quick Start](#-quick-start)
 - [The Spec-Kit-Plus Workflow](#-the-spec-kit-plus-workflow)
+  - [Phase Details](#phase-details)
+  - [What Gets Generated](#what-gets-generated)
+  - [Architecture: Autonomous Enforcement](#architecture-how-autonomous-enforcement-works)
+  - [Workflow Status Commands](#workflow-status-commands)
 - [Writing Requirements](#-writing-requirements)
 - [Pre-Loaded Components](#-pre-loaded-components)
 - [Manual Mode (Optional)](#-manual-mode-optional)
@@ -153,29 +157,37 @@ claude "/sp.autonomous requirements/my-app.md"
 When you run `/sp.autonomous`, this workflow executes:
 
 ```
-┌───────────────────────────────────────────────────────────────────┐
-│                     SPEC-KIT-PLUS WORKFLOW                        │
-│                                                                   │
-│  BOOTSTRAP → ANALYZE → GENERATE → SPEC → PLAN → TASKS            │
-│                                                    ↓              │
-│                              DELIVER ← QA ← IMPLEMENT             │
-│                                                                   │
-└───────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SPEC-KIT-PLUS WORKFLOW                              │
+│                                                                             │
+│  INIT → ANALYZE PROJECT → ANALYZE REQUIREMENTS → GAP ANALYSIS              │
+│                                                       ↓                     │
+│                                          GENERATE → TEST → VERIFY           │
+│                                                            ↓                │
+│           IMPLEMENT ← TASKS ← PLAN ← SPEC ← CONSTITUTION                    │
+│                ↓                                                            │
+│           QA → DELIVER                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Phase Details
 
 | Phase | What Happens | Output |
 |-------|--------------|--------|
-| **BOOTSTRAP** | Create directories, init git, create branch | `.specify/`, `.claude/` |
-| **ANALYZE** | Parse requirements, detect tech stack | Technology map |
-| **GENERATE** | Create skills, agents, hooks for YOUR stack | Custom infrastructure |
-| **SPEC** | Generate detailed specification | `.specify/spec.md` |
-| **PLAN** | Create implementation plan | `.specify/plan.md` |
-| **TASKS** | Break down into actionable items | `.specify/tasks.md` |
-| **IMPLEMENT** | Build each feature with TDD | Source code + tests |
-| **QA** | Code review, test coverage, security check | Quality report |
-| **DELIVER** | Commit, generate report | Complete project |
+| **1. INIT** | Create `.specify/` and `.claude/` directories, setup git | Project structure |
+| **2. ANALYZE PROJECT** | Inventory existing skills, agents, hooks | `project-analysis.json` |
+| **3. ANALYZE REQUIREMENTS** | Parse requirements file, detect technologies | `requirements-analysis.json` |
+| **4. GAP ANALYSIS** | Compare required vs existing, identify gaps | `gap-analysis.json` |
+| **5. GENERATE** | Create missing skills, agents, hooks | Custom infrastructure |
+| **6. TEST** | Validate all generated components work | Verification report |
+| **7. CONSTITUTION** | Define project rules and standards | `.specify/constitution.md` |
+| **8. SPEC** | Generate detailed specification | `.specify/spec.md` |
+| **9. PLAN** | Create implementation plan with architecture | `.specify/plan.md` |
+| **10. TASKS** | Break down into actionable items with skill mappings | `.specify/tasks.md` |
+| **11. IMPLEMENT** | Build each feature using TDD cycle | Source code + tests |
+| **12. QA** | Code review, security review, coverage check | Quality report |
+| **13. DELIVER** | Commit, generate final report | Complete project |
 
 ### What Gets Generated
 
@@ -183,6 +195,10 @@ When you run `/sp.autonomous`, this workflow executes:
 your-project/
 │
 ├── .specify/                      # Spec-Kit-Plus artifacts
+│   ├── project-analysis.json      # Analysis of existing project
+│   ├── requirements-analysis.json # Parsed requirements
+│   ├── gap-analysis.json          # Missing skills/agents/hooks
+│   ├── constitution.md            # Project rules and standards
 │   ├── spec.md                    # Detailed specification
 │   ├── plan.md                    # Implementation plan
 │   ├── data-model.md              # Database schema
@@ -195,8 +211,8 @@ your-project/
 │   │   └── react-patterns/        # (if React detected)
 │   │
 │   ├── agents/                    # GENERATED for your project
-│   │   ├── api-builder/           # (if API project)
-│   │   └── frontend-builder/      # (if frontend project)
+│   │   ├── api-builder.md         # (if API project)
+│   │   └── frontend-builder.md    # (if frontend project)
 │   │
 │   ├── hooks/                     # GENERATED for your workflow
 │   │   ├── pre-commit.sh
@@ -208,6 +224,136 @@ your-project/
 └── src/                           # YOUR PROJECT CODE
     ├── (generated source files)
     └── (generated test files)
+```
+
+### Architecture: How Autonomous Enforcement Works
+
+The workflow is **completely self-enforcing** with zero human intervention required during execution.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      AUTONOMOUS ENFORCEMENT ARCHITECTURE                     │
+│                                                                             │
+│  ┌─────────────┐                                                            │
+│  │   START     │                                                            │
+│  └──────┬──────┘                                                            │
+│         ▼                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  PHASE 0: PRE-CHECK (Always runs first)                             │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐   │   │
+│  │  │ • Invoke workflow-validator skill                           │   │   │
+│  │  │ • Check all phase artifacts                                 │   │   │
+│  │  │ • Detect current state (which phase completed)              │   │   │
+│  │  │ • Decision: FRESH START or RESUME                           │   │   │
+│  │  │ • Fix any skipped phases (violations)                       │   │   │
+│  │  └─────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│         ▼                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  PHASE N: Execute Phase                                             │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐   │   │
+│  │  │ • Run phase logic                                           │   │   │
+│  │  │ • Create phase artifact                                     │   │   │
+│  │  │ • Log progress                                              │   │   │
+│  │  └─────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│         ▼                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  AUTO-VALIDATE (Runs after EVERY phase)                             │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐   │   │
+│  │  │ • Check artifact exists                                     │   │   │
+│  │  │ • Validate content integrity                                │   │   │
+│  │  │         │                                                   │   │   │
+│  │  │    ┌────┴────┐                                              │   │   │
+│  │  │    ▼         ▼                                              │   │   │
+│  │  │  PASS      FAIL                                             │   │   │
+│  │  │    │         │                                              │   │   │
+│  │  │    │    ┌────┴────────────────────┐                         │   │   │
+│  │  │    │    │  SELF-HEAL (max 3x)     │                         │   │   │
+│  │  │    │    │  • Re-run phase         │                         │   │   │
+│  │  │    │    │  • Check again          │                         │   │   │
+│  │  │    │    │  • If still fail: STOP  │                         │   │   │
+│  │  │    │    └─────────────────────────┘                         │   │   │
+│  │  │    ▼                                                        │   │   │
+│  │  │  Proceed to Phase N+1                                       │   │   │
+│  │  └─────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│         ▼                                                                   │
+│  ┌─────────────┐                                                            │
+│  │  COMPLETE   │                                                            │
+│  └─────────────┘                                                            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Features of Autonomous Enforcement
+
+| Feature | How It Works |
+|---------|--------------|
+| **Auto-Detection** | Phase 0 checks all artifacts to know current state |
+| **Smart Resume** | If interrupted, resumes from last completed phase |
+| **Self-Healing** | Failed phases retry automatically (max 3 attempts) |
+| **Violation Detection** | Skipped phases are detected and executed |
+| **Zero Intervention** | No human input needed during execution |
+
+### Phase Artifact Detection
+
+Each phase creates a specific artifact. The validator checks these to determine state:
+
+| Phase | Artifact | Detection Command |
+|-------|----------|-------------------|
+| 1. INIT | `.specify/` directory | `[ -d ".specify" ]` |
+| 2. ANALYZE PROJECT | `project-analysis.json` | `[ -f ".specify/project-analysis.json" ]` |
+| 3. ANALYZE REQUIREMENTS | `requirements-analysis.json` | `[ -f ".specify/requirements-analysis.json" ]` |
+| 4. GAP ANALYSIS | `gap-analysis.json` | `[ -f ".specify/gap-analysis.json" ]` |
+| 5. GENERATE | New skills created | Skill count > baseline |
+| 6. TEST | Validation logs | `grep "validated" logs` |
+| 7. CONSTITUTION | `constitution.md` | `[ -f ".specify/constitution.md" ]` |
+| 8. SPEC | `spec.md` | `[ -f ".specify/spec.md" ]` |
+| 9. PLAN | `plan.md` | `[ -f ".specify/plan.md" ]` |
+| 10. TASKS | `tasks.md` | `[ -f ".specify/tasks.md" ]` |
+| 11. IMPLEMENT | Tasks marked `[X]` | `grep -c "\[X\]" tasks.md` |
+| 12. QA | Build report | Report file exists |
+| 13. DELIVER | Git commit | Commit message contains "autonomous" |
+
+### Workflow Status Commands
+
+Check workflow state anytime:
+
+```bash
+# Quick status check - see which phase you're at
+claude "/q-status"
+
+# Full validation - check for violations
+claude "/q-validate"
+
+# Reset workflow - start fresh
+claude "/q-reset"
+```
+
+Example `/q-status` output:
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║                    WORKFLOW STATUS REPORT                       ║
+╠════════════════════════════════════════════════════════════════╣
+║  [✓] 1. INIT                                                   ║
+║  [✓] 2. ANALYZE PROJECT                                        ║
+║  [✓] 3. ANALYZE REQUIREMENTS                                   ║
+║  [✓] 4. GAP ANALYSIS                                           ║
+║  [→] 5. GENERATE                    ← CURRENT                  ║
+║  [ ] 6. TEST                                                   ║
+║  [ ] 7. CONSTITUTION                                           ║
+║  [ ] 8. SPEC                                                   ║
+║  [ ] 9. PLAN                                                   ║
+║  [ ] 10. TASKS                                                 ║
+║  [ ] 11. IMPLEMENT                                             ║
+║  [ ] 12. QA                                                    ║
+║  [ ] 13. DELIVER                                               ║
+╠════════════════════════════════════════════════════════════════╣
+║  Violations: NONE                                              ║
+║  Next: Generate missing skills (express-patterns, etc.)        ║
+╚════════════════════════════════════════════════════════════════╝
 ```
 
 ---
@@ -309,7 +455,7 @@ The boilerplate comes with pre-loaded components that work out of the box:
 | **doc-updater** | Update documentation |
 | **test-runner** | Run tests |
 
-### Skills (8)
+### Skills (9)
 
 | Skill | What It Contains |
 |-------|------------------|
@@ -321,12 +467,16 @@ The boilerplate comes with pre-loaded components that work out of the box:
 | **claudeception** | Session learning |
 | **mcp-code-execution** | MCP integration |
 | **skill-gap-analyzer** | Detect missing skills |
+| **workflow-validator** | Check workflow state, detect violations |
 
-### Commands (10)
+### Commands (13)
 
 | Command | What It Does |
 |---------|--------------|
-| `/sp.autonomous` | **Full autonomous build** |
+| `/sp.autonomous` | **Full autonomous build** from requirements |
+| `/q-status` | Check workflow state - which phase you're at |
+| `/q-validate` | Validate workflow order, detect violations |
+| `/q-reset` | Reset workflow state for fresh start |
 | `/plan` | Create implementation plan |
 | `/tdd` | Test-driven development |
 | `/code-review` | Security + quality review |
