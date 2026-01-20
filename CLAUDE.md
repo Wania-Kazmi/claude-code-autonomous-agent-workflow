@@ -11,8 +11,10 @@
 |---------|--------------|
 | `/sp.autonomous` | **Full autonomous build** from requirements file |
 | `/q-status` | Check workflow state - which phase you're at |
-| `/q-validate` | Validate workflow order, detect skipped phases |
+| `/q-validate` | Validate workflow order, detect skipped phases, **check component utilization** |
 | `/q-reset` | Reset workflow state (clear .specify/) |
+| `/validate-workflow` | Run workflow-validator skill with full quality gate check |
+| `/validate-components` | Check if skills/agents/hooks are production-ready |
 
 ### Development Commands
 | Command | What It Does |
@@ -65,6 +67,53 @@ Located in `.claude/agents/`:
 | **e2e-runner** | E2E testing | Critical user flows |
 | **refactor-cleaner** | Dead code cleanup | Code maintenance |
 | **doc-updater** | Documentation | Updating docs |
+
+---
+
+## Available Skills (MUST USE)
+
+Located in `.claude/skills/`:
+
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| **workflow-validator** | Quality gate + component utilization | After EVERY phase, validates quality AND checks if skills/agents were used |
+| **component-quality-validator** | Validate generated components | After generating skills/agents/hooks (Phase 6.5) |
+| **skill-gap-analyzer** | Find missing skills | During project analysis |
+| **coding-standards** | Code quality patterns | When writing any code |
+| **testing-patterns** | Test patterns | When writing tests |
+| **api-patterns** | REST/GraphQL patterns | When building APIs |
+| **database-patterns** | DB design patterns | When working with databases |
+
+### Component Utilization Enforcement (CRITICAL)
+
+**The workflow-validator now checks if you're using custom components or bypassing them.**
+
+```
+IF skill/agent exists for task BUT wasn't used:
+    → Phase is REJECTED
+    → Phase is RESET
+    → Must re-do using proper components
+```
+
+**What Gets Checked:**
+- Skills invoked via `Skill(skill-name)` tool
+- Agents invoked via `Task(subagent_type="agent-name")` tool
+- Hooks executing on events
+
+**Bypass = Automatic Phase Reset:**
+```
+Phase 11 (IMPLEMENT) completes
+         ↓
+workflow-validator checks:
+  - Did you use coding-standards skill?
+  - Did you use tdd-guide agent?
+  - Did you use code-reviewer agent?
+         ↓
+    Any bypass detected?
+         ↓
+    YES → RESET phase, start over with proper components
+    NO  → APPROVED, continue
+```
 
 ---
 
@@ -202,6 +251,9 @@ Located in `.claude/rules/`:
 6. **80% coverage** - Minimum test coverage
 7. **No secrets in code** - Use environment variables
 8. **Fix incrementally** - One error at a time
+9. **Use existing skills** - ALWAYS use `Skill(name)` for matching tasks
+10. **Use existing agents** - ALWAYS use `Task(subagent_type)` for specialized work
+11. **Validate after phases** - Run `/q-validate` to check component utilization
 
 ---
 

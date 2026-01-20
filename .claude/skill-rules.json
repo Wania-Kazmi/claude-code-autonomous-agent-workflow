@@ -79,6 +79,16 @@
       "intentPatterns": ["review.*code", "check.*security", "validate.*code"],
       "priority": "high"
     },
+    "workflow-validation": {
+      "keywords": ["validate", "validation", "quality gate", "phase check", "workflow status", "component utilization", "q-status", "q-validate", "bypass detection"],
+      "intentPatterns": ["validate.*phase", "check.*workflow", "verify.*quality", "component.*usage", "skill.*usage", "agent.*usage"],
+      "priority": "critical"
+    },
+    "component-quality": {
+      "keywords": ["component quality", "skill quality", "agent quality", "hook quality", "production ready", "validate component"],
+      "intentPatterns": ["validate.*skill", "check.*agent", "verify.*hook", "quality.*check"],
+      "priority": "high"
+    },
     "project-init": {
       "keywords": ["new project", "initialize", "bootstrap", "setup project", "start project", "requirements file"],
       "intentPatterns": ["create.*project", "initialize.*from", "bootstrap.*project", "analyze.*requirements"],
@@ -101,14 +111,22 @@
     },
     "after_implementation": {
       "patterns": ["implemented", "finished coding", "completed feature", "done with"],
-      "requiredCategories": ["testing", "code-review"]
+      "requiredCategories": ["testing", "code-review", "workflow-validation"]
+    },
+    "phase_completion": {
+      "patterns": ["phase complete", "phase done", "finished phase", "next phase", "validate phase"],
+      "requiredCategories": ["workflow-validation"]
+    },
+    "autonomous_build": {
+      "patterns": ["autonomous", "sp.autonomous", "auto build", "full build"],
+      "requiredCategories": ["workflow-validation", "component-quality"]
     }
   },
 
   "enforcementRules": {
     "mandatory": {
       "description": "MUST use matching skill - block if skipped",
-      "categories": ["project-init", "specification", "planning", "testing", "code-review"]
+      "categories": ["project-init", "specification", "planning", "testing", "code-review", "workflow-validation", "component-quality"]
     },
     "suggested": {
       "description": "Should use - warn if skipped",

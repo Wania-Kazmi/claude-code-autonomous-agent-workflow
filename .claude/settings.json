@@ -67,6 +67,15 @@
             "command": "echo \"[$(date -Iseconds)] Skill invoked: $CLAUDE_SKILL_NAME\" >> .claude/logs/skill-invocations.log 2>/dev/null || true"
           }
         ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[$(date -Iseconds)] Agent task invoked\" >> .claude/logs/agent-usage.log 2>/dev/null || true"
+          }
+        ]
       }
     ],
     "Stop": [

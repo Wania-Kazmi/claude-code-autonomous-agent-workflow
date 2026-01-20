@@ -675,6 +675,752 @@ fi
 
 ---
 
+## COMPONENT UTILIZATION VALIDATION (Cross-Cutting)
+
+> **Critical Check**: Are custom skills, agents, and hooks being used? Or is the general agent doing everything without leveraging the ecosystem?
+
+This validation runs alongside EVERY phase (especially Phase 11+) to ensure the work is being done **through** the custom components, not around them.
+
+### Why This Matters
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    COMPONENT UTILIZATION ENFORCEMENT                        │
+│                                                                             │
+│   "If you built skills, agents, and hooks - USE THEM."                     │
+│                                                                             │
+│   Problem: General Claude agent can do everything, but:                     │
+│   - Custom skills contain SPECIALIZED knowledge                             │
+│   - Custom agents have OPTIMIZED workflows                                  │
+│   - Hooks provide AUTOMATED guardrails                                      │
+│                                                                             │
+│   If work bypasses these → QUALITY DEGRADATION                             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### What to Check
+
+**1. Skill Invocation Logs**
+```bash
+# Check if skills are being invoked
+cat .claude/logs/skill-invocations.log 2>/dev/null | wc -l
+
+# List which skills were used
+cat .claude/logs/skill-invocations.log 2>/dev/null | grep -oP 'Skill invoked: \K\S+' | sort | uniq -c
+```
+
+**2. Tool Usage Logs**
+```bash
+# Check tool usage patterns
+cat .claude/logs/tool-usage.log 2>/dev/null | wc -l
+
+# Detect if Task tool is being used (agents)
+cat .claude/logs/tool-usage.log 2>/dev/null | grep -c "Task"
+```
+
+**3. Available vs Used Components**
+```bash
+# List available skills
+ls -1 .claude/skills/ | grep -v "^\." | wc -l
+
+# List available agents
+ls -1 .claude/agents/ | grep -v "^\." | wc -l
+
+# Compare with invocation logs
+```
+
+### Component Utilization Criteria
+
+| Criterion | Weight | Pass Condition |
+|-----------|--------|----------------|
+| Skills invoked during work | 25% | At least 1 skill per feature |
+| Correct skills for technology | 20% | Matching tech → skill mapping |
+| Agents used via Task tool | 20% | Task(subagent_type) calls logged |
+| Hooks executing on events | 15% | PreToolUse/PostToolUse active |
+| No bypass of available components | 20% | General agent didn't duplicate |
+
+### Utilization Analysis Function
+
+```python
+def validate_component_utilization(phase: int, feature_count: int = 1) -> tuple[str, list, dict]:
+    """
+    Validate that custom skills, agents, and hooks are being utilized.
+    Returns: (grade, issues, usage_report)
+    """
+    import os
+    import json
+    from pathlib import Path
+    from datetime import datetime, timedelta
+
+    issues = []
+    score = 0
+    usage_report = {
+        'skills_available': [],
+        'skills_used': [],
+        'skills_unused': [],
+        'agents_available': [],
+        'agents_used': [],
+        'agents_unused': [],
+        'hooks_triggered': 0,
+        'utilization_percentage': 0
+    }
+
+    # 1. Get available components
+    skills_dir = Path('.claude/skills')
+    agents_dir = Path('.claude/agents')
+
+    if skills_dir.exists():
+        usage_report['skills_available'] = [
+            d.name for d in skills_dir.iterdir()
+            if d.is_dir() and not d.name.startswith('.')
+        ]
+
+    if agents_dir.exists():
+        usage_report['agents_available'] = [
+            f.stem for f in agents_dir.glob('*.md')
+            if not f.name.startswith('.')
+        ]
+
+    # 2. Check skill invocation logs
+    skill_log = Path('.claude/logs/skill-invocations.log')
+    if skill_log.exists():
+        with open(skill_log) as f:
+            for line in f:
+                if 'Skill invoked:' in line:
+                    skill_name = line.split('Skill invoked:')[1].strip()
+                    if skill_name not in usage_report['skills_used']:
+                        usage_report['skills_used'].append(skill_name)
+
+    # 3. Check tool usage for Task (agent) calls
+    tool_log = Path('.claude/logs/tool-usage.log')
+    agent_invocations = []
+    if tool_log.exists():
+        with open(tool_log) as f:
+            for line in f:
+                # Look for Task tool usage patterns
+                if 'Task' in line or 'subagent' in line.lower():
+                    agent_invocations.append(line.strip())
+
+    # Detect which agents were used (from subagent_type patterns)
+    for agent in usage_report['agents_available']:
+        agent_patterns = [agent, agent.replace('-', '_'), agent.replace('_', '-')]
+        for pattern in agent_patterns:
+            if any(pattern in inv for inv in agent_invocations):
+                if agent not in usage_report['agents_used']:
+                    usage_report['agents_used'].append(agent)
+                break
+
+    # 4. Calculate unused components
+    usage_report['skills_unused'] = [
+        s for s in usage_report['skills_available']
+        if s not in usage_report['skills_used']
+    ]
+    usage_report['agents_unused'] = [
+        a for a in usage_report['agents_available']
+        if a not in usage_report['agents_used']
+    ]
+
+    # 5. Score calculation
+
+    # Skill utilization (25%)
+    skills_available = len(usage_report['skills_available'])
+    skills_used = len(usage_report['skills_used'])
+    if skills_available > 0:
+        skill_ratio = skills_used / min(skills_available, feature_count * 2)
+        if skill_ratio >= 0.5:
+            score += 25
+        elif skill_ratio >= 0.25:
+            score += 15
+            issues.append(f"Low skill utilization: {skills_used}/{skills_available} skills used")
+        else:
+            score += 5
+            issues.append(f"CRITICAL: Only {skills_used} skills used out of {skills_available} available")
+    else:
+        score += 25  # No skills available = pass
+
+    # Technology matching (20%)
+    # Check if used skills match project technologies
+    req_analysis_path = Path('.specify/requirements-analysis.json')
+    if req_analysis_path.exists():
+        with open(req_analysis_path) as f:
+            req_data = json.load(f)
+            technologies = req_data.get('technologies_required', [])
+
+            matched_techs = 0
+            for tech in technologies:
+                tech_skill_patterns = [
+                    f"{tech}-patterns",
+                    f"{tech}-generator",
+                    tech.lower(),
+                    tech.replace('.', '').lower()
+                ]
+                if any(pattern in s.lower() for s in usage_report['skills_used'] for pattern in tech_skill_patterns):
+                    matched_techs += 1
+
+            if len(technologies) > 0:
+                match_ratio = matched_techs / len(technologies)
+                if match_ratio >= 0.7:
+                    score += 20
+                elif match_ratio >= 0.4:
+                    score += 12
+                    issues.append(f"Technology-skill mismatch: {matched_techs}/{len(technologies)} covered")
+                else:
+                    score += 5
+                    issues.append(f"CRITICAL: Most technologies lack skill coverage")
+            else:
+                score += 20  # No tech requirements = pass
+    else:
+        score += 10  # Can't verify without requirements
+
+    # Agent utilization (20%)
+    agents_available = len(usage_report['agents_available'])
+    agents_used = len(usage_report['agents_used'])
+    if agents_available > 0:
+        # Expected agents for implementation: code-reviewer, tdd-guide, build-error-resolver
+        expected_agents = ['code-reviewer', 'tdd-guide', 'build-error-resolver']
+        expected_used = [a for a in expected_agents if a in usage_report['agents_used']]
+
+        if len(expected_used) >= 2:
+            score += 20
+        elif len(expected_used) >= 1:
+            score += 12
+            issues.append(f"Limited agent usage: Only {expected_used} of {expected_agents} used")
+        else:
+            score += 5
+            issues.append(f"CRITICAL: Core agents not used - general agent doing everything")
+    else:
+        score += 20  # No agents = pass
+
+    # Hooks active (15%)
+    hooks_json = Path('.claude/hooks.json')
+    settings_json = Path('.claude/settings.json')
+    hooks_configured = 0
+
+    for hook_file in [hooks_json, settings_json]:
+        if hook_file.exists():
+            with open(hook_file) as f:
+                try:
+                    data = json.load(f)
+                    if 'hooks' in data:
+                        for hook_type in ['PreToolUse', 'PostToolUse', 'Stop', 'UserPromptSubmit']:
+                            if hook_type in data['hooks']:
+                                hooks_configured += len(data['hooks'][hook_type])
+                except:
+                    pass
+
+    usage_report['hooks_triggered'] = hooks_configured
+    if hooks_configured >= 3:
+        score += 15
+    elif hooks_configured >= 1:
+        score += 8
+        issues.append(f"Limited hooks: Only {hooks_configured} hook(s) configured")
+    else:
+        issues.append("No hooks configured - missing automated guardrails")
+
+    # No bypass check (20%)
+    # If skills/agents exist but weren't used, penalize
+    bypass_detected = False
+
+    if skills_available > 3 and skills_used == 0:
+        bypass_detected = True
+        issues.append("BYPASS DETECTED: Skills exist but none were invoked")
+
+    if agents_available > 5 and agents_used == 0:
+        bypass_detected = True
+        issues.append("BYPASS DETECTED: Agents exist but Task tool not used")
+
+    if not bypass_detected:
+        score += 20
+    else:
+        score += 0
+        issues.append("General agent is doing work without utilizing custom components")
+
+    # Calculate utilization percentage
+    total_components = skills_available + agents_available
+    used_components = skills_used + agents_used
+    if total_components > 0:
+        usage_report['utilization_percentage'] = round((used_components / total_components) * 100, 1)
+    else:
+        usage_report['utilization_percentage'] = 100
+
+    # Determine grade
+    if score >= 90: grade = 'A'
+    elif score >= 80: grade = 'B'
+    elif score >= 70: grade = 'C'
+    elif score >= 50: grade = 'D'
+    else: grade = 'F'
+
+    return grade, issues, usage_report
+```
+
+### Component Utilization Report Template
+
+```markdown
+# Component Utilization Report
+
+## Summary
+| Metric | Value |
+|--------|-------|
+| Phase | {N} |
+| Utilization Grade | {A/B/C/D/F} |
+| Utilization Score | {X}/100 |
+| Overall Utilization | {Y}% |
+
+## Skills Analysis
+| Category | Count | Details |
+|----------|-------|---------|
+| Available | {X} | {list} |
+| Used | {Y} | {list} |
+| Unused | {Z} | {list} |
+
+**Skill Coverage:** {used}/{available} ({percentage}%)
+
+## Agents Analysis
+| Category | Count | Details |
+|----------|-------|---------|
+| Available | {X} | {list} |
+| Used | {Y} | {list} |
+| Unused | {Z} | {list} |
+
+**Agent Coverage:** {used}/{available} ({percentage}%)
+
+## Hooks Analysis
+| Hook Type | Count | Active |
+|-----------|-------|--------|
+| PreToolUse | {X} | ✓/✗ |
+| PostToolUse | {Y} | ✓/✗ |
+| Stop | {Z} | ✓/✗ |
+| UserPromptSubmit | {W} | ✓/✗ |
+
+## Bypass Detection
+{NONE DETECTED / BYPASS DETECTED}
+
+{If bypass detected:}
+⚠️ **Warning:** Work is being done without utilizing custom components.
+- Skills bypassed: {list}
+- Agents bypassed: {list}
+
+**Impact:** Quality may be degraded. Custom components contain specialized
+knowledge that the general agent doesn't have.
+
+## Recommendations
+
+1. **Use Skill tool:** `Skill(skill-name)` before implementing features
+2. **Use Task tool:** `Task(subagent_type="agent-name")` for specialized work
+3. **Verify hooks:** Check `.claude/hooks.json` is properly configured
+
+## Decision
+
+{If utilization >= 70%}
+✅ Component utilization is acceptable. Custom ecosystem is being leveraged.
+
+{If utilization 50-69%}
+⚠️ Component utilization is low. Review which components should be used.
+
+{If utilization < 50%}
+❌ CRITICAL: Custom components are being bypassed. This defeats the purpose
+   of the autonomous workflow system. Re-run phase using proper components.
+```
+
+### Integration with Phase Validation
+
+**For Phase 11 (IMPLEMENT) - MANDATORY:**
+
+Add to Phase 11 criteria:
+
+| Criterion | Weight | Pass Condition |
+|-----------|--------|----------------|
+| Component utilization >= 50% | 15% | Skills/agents being used |
+| Core agents invoked | 10% | code-reviewer, tdd-guide |
+| Skill-to-technology mapping | 10% | Correct skills for stack |
+
+**Enforcement Rule:**
+```
+IF component_utilization < 50% AND skills_available > 3:
+    REJECT phase with "Component Bypass Detected"
+    REQUIRE re-implementation using custom components
+```
+
+### Log File Setup
+
+Ensure these log files are being populated:
+
+```bash
+# Create log directory
+mkdir -p .claude/logs
+
+# skill-invocations.log format:
+# [2024-01-15T10:30:00] Skill invoked: api-patterns
+# [2024-01-15T10:31:00] Skill invoked: testing-patterns
+
+# tool-usage.log format:
+# [2024-01-15T10:30:00] Tool: Edit | File: src/api/routes.ts
+# [2024-01-15T10:31:00] Tool: Task | Subagent: code-reviewer
+```
+
+### Settings.json Hook Configuration
+
+Verify these hooks exist in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"[$(date -Iseconds)] Skill invoked: $CLAUDE_SKILL_NAME\" >> .claude/logs/skill-invocations.log"
+        }]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"[$(date -Iseconds)] Agent task: $CLAUDE_TOOL_INPUT\" >> .claude/logs/agent-usage.log"
+        }]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## PHASE RESET ENFORCEMENT (CRITICAL)
+
+> **Rule**: If a custom skill, agent, or hook EXISTS for a task but the general agent completed that task WITHOUT using it, the phase MUST be RESET and re-executed.
+
+### Why Reset?
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      BYPASS = AUTOMATIC PHASE RESET                         │
+│                                                                             │
+│   Custom components contain:                                                │
+│   - SPECIALIZED knowledge the general agent doesn't have                    │
+│   - VALIDATED patterns that prevent common mistakes                         │
+│   - OPTIMIZED workflows developed through experience                        │
+│                                                                             │
+│   Bypassing them = Lower quality output = Unacceptable                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Reset Trigger Conditions
+
+A phase is RESET if ANY of these conditions are met:
+
+| Condition | Example | Action |
+|-----------|---------|--------|
+| Skill exists but not invoked | `coding-standards` exists, code written without `Skill(coding-standards)` | RESET |
+| Agent exists but not used | `code-reviewer` exists, code not reviewed via `Task(subagent_type="code-reviewer")` | RESET |
+| Hook should have fired but didn't | PreToolUse hook for testing, tests skipped | RESET |
+| Technology skill available but ignored | `api-patterns` exists, API built without using it | RESET |
+
+### Phase Reset Protocol
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PHASE RESET PROTOCOL                                │
+│                                                                             │
+│  1. DETECT bypass (component available but not used)                        │
+│  2. LOG bypass to .specify/validations/bypass-log.json                      │
+│  3. CLEAR phase artifacts (code, tests written without components)          │
+│  4. INCREMENT reset counter (max 3 resets per phase)                        │
+│  5. NOTIFY: "Phase X reset due to component bypass"                         │
+│  6. RESTART phase with EXPLICIT component requirements                      │
+│                                                                             │
+│  After 3 resets: STOP workflow, require manual intervention                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Reset Detection Function
+
+```python
+def check_and_reset_phase(phase: int, phase_artifacts: dict) -> dict:
+    """
+    Check if phase was completed properly using components.
+    If not, trigger reset.
+
+    Returns: {
+        'action': 'CONTINUE' | 'RESET' | 'STOP',
+        'reason': str,
+        'bypassed_components': list,
+        'reset_count': int
+    }
+    """
+    import json
+    from pathlib import Path
+
+    result = {
+        'action': 'CONTINUE',
+        'reason': '',
+        'bypassed_components': [],
+        'reset_count': 0
+    }
+
+    # Load reset counter
+    reset_file = Path('.specify/validations/reset-counter.json')
+    reset_data = {}
+    if reset_file.exists():
+        with open(reset_file) as f:
+            reset_data = json.load(f)
+
+    phase_key = f"phase_{phase}"
+    result['reset_count'] = reset_data.get(phase_key, 0)
+
+    # Check if max resets exceeded
+    if result['reset_count'] >= 3:
+        result['action'] = 'STOP'
+        result['reason'] = f"Phase {phase} reset 3 times. Manual intervention required."
+        return result
+
+    # Get component utilization
+    grade, issues, usage = validate_component_utilization(phase)
+
+    # Check for bypass
+    bypass_detected = False
+    bypassed = []
+
+    # Check skill bypass
+    for skill in usage.get('skills_unused', []):
+        # Check if this skill SHOULD have been used for this phase
+        if should_skill_be_used(skill, phase, phase_artifacts):
+            bypass_detected = True
+            bypassed.append(f"skill:{skill}")
+
+    # Check agent bypass
+    expected_agents = get_expected_agents_for_phase(phase)
+    for agent in expected_agents:
+        if agent not in usage.get('agents_used', []):
+            bypass_detected = True
+            bypassed.append(f"agent:{agent}")
+
+    if bypass_detected:
+        result['action'] = 'RESET'
+        result['reason'] = f"Components bypassed: {', '.join(bypassed)}"
+        result['bypassed_components'] = bypassed
+
+        # Increment reset counter
+        reset_data[phase_key] = result['reset_count'] + 1
+        reset_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(reset_file, 'w') as f:
+            json.dump(reset_data, f, indent=2)
+
+        # Log bypass
+        log_bypass(phase, bypassed)
+
+    return result
+
+
+def should_skill_be_used(skill: str, phase: int, artifacts: dict) -> bool:
+    """Determine if a skill should have been used for this phase."""
+
+    skill_phase_mapping = {
+        'coding-standards': [11],      # IMPLEMENT
+        'testing-patterns': [11, 12],  # IMPLEMENT, QA
+        'api-patterns': [11],          # IMPLEMENT (if API project)
+        'database-patterns': [11],     # IMPLEMENT (if has DB)
+        'workflow-validator': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],  # ALL phases
+        'component-quality-validator': [5, 6],  # GENERATE, TEST
+    }
+
+    applicable_phases = skill_phase_mapping.get(skill, [])
+    return phase in applicable_phases
+
+
+def get_expected_agents_for_phase(phase: int) -> list:
+    """Get list of agents expected to be used for a phase."""
+
+    phase_agents = {
+        8: ['planner'],                           # SPEC
+        9: ['planner', 'architect'],              # PLAN
+        11: ['tdd-guide', 'code-reviewer'],       # IMPLEMENT
+        12: ['code-reviewer', 'security-reviewer', 'e2e-runner'],  # QA
+        13: ['git-ops'],                          # DELIVER
+    }
+
+    return phase_agents.get(phase, [])
+
+
+def log_bypass(phase: int, bypassed: list):
+    """Log bypass event for audit trail."""
+    import json
+    from datetime import datetime
+    from pathlib import Path
+
+    log_file = Path('.specify/validations/bypass-log.json')
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+
+    logs = []
+    if log_file.exists():
+        with open(log_file) as f:
+            logs = json.load(f)
+
+    logs.append({
+        'timestamp': datetime.now().isoformat(),
+        'phase': phase,
+        'bypassed_components': bypassed,
+        'action': 'RESET_TRIGGERED'
+    })
+
+    with open(log_file, 'w') as f:
+        json.dump(logs, f, indent=2)
+```
+
+### Phase Reset Execution
+
+```bash
+#!/bin/bash
+# reset-phase.sh <phase_number>
+
+PHASE=$1
+SPECIFY_DIR=".specify"
+
+echo "╔════════════════════════════════════════════════════════════════╗"
+echo "║              PHASE $PHASE RESET - COMPONENT BYPASS              ║"
+echo "╠════════════════════════════════════════════════════════════════╣"
+echo "║                                                                ║"
+echo "║  ⚠️  Phase $PHASE was completed WITHOUT using required         ║"
+echo "║     skills/agents. This is NOT acceptable.                     ║"
+echo "║                                                                ║"
+echo "║  The following will be reset:                                  ║"
+
+case $PHASE in
+    11)
+        echo "║  - Source code written during this phase                       ║"
+        echo "║  - Tests written during this phase                             ║"
+        echo "║                                                                ║"
+        echo "║  REQUIRED for retry:                                           ║"
+        echo "║  - Use Skill(coding-standards) before coding                   ║"
+        echo "║  - Use Skill(testing-patterns) before tests                    ║"
+        echo "║  - Use Task(subagent_type='tdd-guide') for TDD                ║"
+        echo "║  - Use Task(subagent_type='code-reviewer') after code         ║"
+        ;;
+    12)
+        echo "║  - QA reports from this phase                                  ║"
+        echo "║                                                                ║"
+        echo "║  REQUIRED for retry:                                           ║"
+        echo "║  - Use Task(subagent_type='code-reviewer')                    ║"
+        echo "║  - Use Task(subagent_type='security-reviewer')                ║"
+        echo "║  - Use Task(subagent_type='e2e-runner')                       ║"
+        ;;
+    *)
+        echo "║  - Phase $PHASE artifacts                                      ║"
+        ;;
+esac
+
+echo "║                                                                ║"
+echo "╚════════════════════════════════════════════════════════════════╝"
+
+# Mark phase for reset
+echo "{\"phase\": $PHASE, \"status\": \"RESET\", \"timestamp\": \"$(date -Iseconds)\"}" > "$SPECIFY_DIR/phase-$PHASE-reset.json"
+
+echo ""
+echo "🔄 Phase $PHASE has been marked for reset."
+echo "📋 Re-run the phase using the REQUIRED components listed above."
+```
+
+### Integration with Phase Validation
+
+Every phase validation now includes component utilization check:
+
+```
+Phase N completes
+       ↓
+┌──────────────────────────────────────────────────────────────┐
+│  QUALITY GATE VALIDATION (existing)                          │
+│  + COMPONENT UTILIZATION CHECK (new)                         │
+│                                                              │
+│  1. Validate phase artifacts (existing)                      │
+│  2. Check component utilization (NEW)                        │
+│  3. If bypass detected → RESET phase                         │
+│  4. If no bypass → Continue to grade                         │
+└──────────────────────────────────────────────────────────────┘
+       │
+   ┌───┴───┐
+   │       │
+PASS    BYPASS
+   │       │
+   ↓       ↓
+Grade  RESET
+   │       │
+   ↓       ↓
+NEXT   RE-DO
+```
+
+### Reset Report Template
+
+When a reset occurs, generate `.specify/validations/phase-{N}-reset-report.md`:
+
+```markdown
+# Phase {N} Reset Report
+
+## Summary
+| Field | Value |
+|-------|-------|
+| Phase | {N}: {Phase Name} |
+| Timestamp | {ISO timestamp} |
+| Action | **RESET** |
+| Reset Count | {X} of 3 |
+
+## Bypass Detected
+
+The following components were available but NOT used:
+
+### Skills Bypassed
+| Skill | Should Have Been Used For |
+|-------|---------------------------|
+| {skill-name} | {reason} |
+
+### Agents Bypassed
+| Agent | Should Have Been Used For |
+|-------|---------------------------|
+| {agent-name} | {reason} |
+
+## Impact
+
+By bypassing these components, the following quality guarantees were lost:
+- {guarantee 1}
+- {guarantee 2}
+
+## Required Actions
+
+To successfully complete Phase {N}, you MUST:
+
+1. **Before writing code:**
+   ```
+   Skill(coding-standards)
+   Skill(testing-patterns)  # if writing tests
+   ```
+
+2. **During implementation:**
+   ```
+   Task(subagent_type="tdd-guide", prompt="...")
+   ```
+
+3. **After implementation:**
+   ```
+   Task(subagent_type="code-reviewer", prompt="Review code in ...")
+   ```
+
+## Warning
+
+⚠️ This is reset {X} of 3. After 3 resets, the workflow will STOP
+and require manual intervention.
+
+## Next Steps
+
+1. Review this report
+2. Re-run Phase {N} using the required components
+3. Validate with `/q-validate` before proceeding
+```
+
+---
+
 ## INTEGRATION WITH sp.autonomous
 
 The sp.autonomous command MUST call this validator after EVERY phase:
