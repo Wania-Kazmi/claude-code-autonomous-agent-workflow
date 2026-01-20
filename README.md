@@ -164,12 +164,37 @@ When you run `/sp.autonomous`, this workflow executes:
 │                                                       ↓                     │
 │                                          GENERATE → TEST → VERIFY           │
 │                                                            ↓                │
-│           IMPLEMENT ← TASKS ← PLAN ← SPEC ← CONSTITUTION                    │
-│                ↓                                                            │
-│           QA → DELIVER                                                      │
+│                                               CONSTITUTION (ONE)            │
+│                                                       ↓                     │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │  SIMPLE (1-3 features):     COMPLEX (4+ features):                     │ │
+│  │  SPEC → PLAN → TASKS →      For EACH feature:                          │ │
+│  │  IMPLEMENT → QA             SPEC → PLAN → TASKS → IMPLEMENT →          │ │
+│  │                             UNIT TESTS → INTER-FEATURE TESTS           │ │
+│  │                                         ↓                              │ │
+│  │                             INTEGRATION QA (All features)              │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                       ↓                                     │
+│                                   DELIVER                                   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### SIMPLE vs COMPLEX Mode
+
+The workflow automatically detects project complexity:
+
+| Mode | Feature Count | Workflow |
+|------|---------------|----------|
+| **SIMPLE** | 1-3 features | Single spec/plan/tasks cycle |
+| **COMPLEX** | 4+ features | Per-feature iteration with inter-feature testing |
+
+**COMPLEX Mode** ensures:
+- ONE constitution for the whole project
+- Each feature gets its own spec → plan → tasks → implement cycle
+- Unit tests run after each feature
+- Inter-feature regression tests after feature 2+
+- Full integration testing at the end
 
 ### Phase Details
 
@@ -182,12 +207,34 @@ When you run `/sp.autonomous`, this workflow executes:
 | **5. GENERATE** | Create missing skills, agents, hooks | Custom infrastructure |
 | **6. TEST** | Validate all generated components work | Verification report |
 | **7. CONSTITUTION** | Define project rules and standards | `.specify/constitution.md` |
-| **8. SPEC** | Generate detailed specification | `.specify/spec.md` |
-| **9. PLAN** | Create implementation plan with architecture | `.specify/plan.md` |
-| **10. TASKS** | Break down into actionable items with skill mappings | `.specify/tasks.md` |
-| **11. IMPLEMENT** | Build each feature using TDD cycle | Source code + tests |
-| **12. QA** | Code review, security review, coverage check | Quality report |
+| **7.5. FEATURE BREAKDOWN** | (COMPLEX only) Break project into features | Feature list with dependencies |
+| **8-10. SPEC/PLAN/TASKS** | Per-feature (COMPLEX) or whole project (SIMPLE) | `.specify/spec.md`, `plan.md`, `tasks.md` |
+| **11. IMPLEMENT** | Build using TDD (write tests first) | Source code + unit tests |
+| **11.5. FEATURE QA** | Verify feature's unit tests pass | Test report |
+| **11.6. INTER-FEATURE TESTS** | (COMPLEX, 2+ features) Run ALL unit tests | Regression check |
+| **12. INTEGRATION QA** | Full test suite: unit + integration + E2E | Complete quality report |
 | **13. DELIVER** | Commit, generate final report | Complete project |
+
+### Testing Strategy
+
+The workflow enforces a comprehensive testing strategy:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            TESTING PYRAMID                                  │
+│                                                                             │
+│    Phase 11    │  Feature N unit tests (TDD - write first, then implement)  │
+│    Phase 11.5  │  Feature N unit tests (verify implementation passes)       │
+│    Phase 11.6  │  ALL unit tests (Feature 1 → N) - catch regressions       │
+│    Phase 12    │  ALL unit + integration + E2E tests                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Coverage Requirements:**
+- **80% minimum** for all code
+- **100% required** for financial, auth, and security code
+- All features must pass inter-feature regression tests
 
 ### What Gets Generated
 
@@ -295,6 +342,37 @@ The workflow is **completely self-enforcing** with zero human intervention requi
 | **Self-Healing** | Failed phases retry automatically (max 3 attempts) |
 | **Violation Detection** | Skipped phases are detected and executed |
 | **Zero Intervention** | No human input needed during execution |
+| **Quality Gate Teacher** | Grades each phase A/B/C/D/F with APPROVED/REJECTED |
+
+### Quality Gate Teacher
+
+Every phase is validated by the Quality Gate Teacher before proceeding:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        QUALITY GATE TEACHER                                  │
+│                                                                             │
+│   ┌─────────────┐      ┌─────────────┐      ┌─────────────┐                │
+│   │  Phase N    │ ───▶ │   TEACHER   │ ───▶ │  Grade +    │                │
+│   │  Output     │      │   Evaluate  │      │  Decision   │                │
+│   └─────────────┘      └─────────────┘      └─────────────┘                │
+│                                                    │                        │
+│                        ┌───────────────────────────┼──────────────────┐     │
+│                        ▼                           ▼                  ▼     │
+│                   A (90-100%)                B/C (70-89%)        D/F (<70%) │
+│                   APPROVED                   APPROVED            REJECTED   │
+│                   Continue                   Continue            Self-Heal  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Grading Criteria (varies by phase):**
+- Constitution: Clarity, completeness, enforceability
+- Spec: Feature coverage, acceptance criteria, technical accuracy
+- Plan: Architecture quality, risk assessment, dependency mapping
+- Tasks: Granularity, skill mapping, dependency order
+- Implementation: Code quality, test coverage, security
+- Testing: Pass rate, coverage percentage, regression status
 
 ### Phase Artifact Detection
 
@@ -309,11 +387,14 @@ Each phase creates a specific artifact. The validator checks these to determine 
 | 5. GENERATE | New skills created | Skill count > baseline |
 | 6. TEST | Validation logs | `grep "validated" logs` |
 | 7. CONSTITUTION | `constitution.md` | `[ -f ".specify/constitution.md" ]` |
-| 8. SPEC | `spec.md` | `[ -f ".specify/spec.md" ]` |
-| 9. PLAN | `plan.md` | `[ -f ".specify/plan.md" ]` |
-| 10. TASKS | `tasks.md` | `[ -f ".specify/tasks.md" ]` |
+| 7.5 FEATURE BREAKDOWN | `features.json` | `[ -f ".specify/features.json" ]` (COMPLEX only) |
+| 8. SPEC | `spec.md` or `features/N/spec.md` | Spec file exists |
+| 9. PLAN | `plan.md` or `features/N/plan.md` | Plan file exists |
+| 10. TASKS | `tasks.md` or `features/N/tasks.md` | Tasks file exists |
 | 11. IMPLEMENT | Tasks marked `[X]` | `grep -c "\[X\]" tasks.md` |
-| 12. QA | Build report | Report file exists |
+| 11.5 FEATURE QA | Unit tests pass | Test exit code 0 |
+| 11.6 INTER-FEATURE | All unit tests pass | Combined test exit code 0 |
+| 12. INTEGRATION QA | Full test suite pass | Unit + Integration + E2E pass |
 | 13. DELIVER | Git commit | Commit message contains "autonomous" |
 
 ### Workflow Status Commands
@@ -354,6 +435,68 @@ Example `/q-status` output:
 ║  Violations: NONE                                              ║
 ║  Next: Generate missing skills (express-patterns, etc.)        ║
 ╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## 🏗️ Complex Projects: Feature Iteration
+
+For complex projects (4+ features), the workflow uses a sophisticated iteration pattern:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    COMPLEX PROJECT FEATURE ITERATION                         │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  CONSTITUTION (ONE for entire project - Phase 7)                        ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                    ↓                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  FEATURE BREAKDOWN (Phase 7.5)                                          ││
+│  │  → Extract features from requirements                                   ││
+│  │  → Map dependencies between features                                    ││
+│  │  → Order features by dependency graph                                   ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                    ↓                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  FOR EACH FEATURE (in dependency order):                                ││
+│  │  ┌─────────────────────────────────────────────────────────────────────┐││
+│  │  │  8. SPEC (feature-specific)                                         │││
+│  │  │  9. PLAN (feature-specific)                                         │││
+│  │  │ 10. TASKS (feature-specific)                                        │││
+│  │  │ 11. IMPLEMENT (TDD: tests first, then code)                         │││
+│  │  │ 11.5 FEATURE QA (unit tests for this feature)                       │││
+│  │  │ 11.6 INTER-FEATURE TESTS (all unit tests, if feature 2+)            │││
+│  │  └─────────────────────────────────────────────────────────────────────┘││
+│  │                              ↓ (next feature)                           ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                    ↓                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  12. INTEGRATION QA (Full test suite across all features)               ││
+│  │      → Unit tests (all features)                                        ││
+│  │      → Integration tests (feature interactions)                         ││
+│  │      → E2E tests (user journeys)                                        ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                    ↓                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  13. DELIVER                                                            ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Example: E-Commerce Platform (5 Features)
+
+```
+Feature 1: User Auth     → Spec → Plan → Tasks → Implement → Unit Tests ✓
+Feature 2: Products      → Spec → Plan → Tasks → Implement → Unit Tests → Inter-Feature Tests ✓
+Feature 3: Cart          → Spec → Plan → Tasks → Implement → Unit Tests → Inter-Feature Tests ✓
+Feature 4: Orders        → Spec → Plan → Tasks → Implement → Unit Tests → Inter-Feature Tests ✓
+Feature 5: Payments      → Spec → Plan → Tasks → Implement → Unit Tests → Inter-Feature Tests ✓
+                                                    ↓
+                         INTEGRATION QA (All features together)
+                                                    ↓
+                                    DELIVER
 ```
 
 ---

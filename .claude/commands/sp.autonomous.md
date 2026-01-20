@@ -324,13 +324,28 @@ Validate:
 │    │  Phase 11.5: FEATURE QA                                         │     │
 │    │    → Code review for this feature                               │     │
 │    │    → Security review if auth-related                            │     │
-│    │    → Integration test with previous features                    │     │
+│    │    → Feature-level tests pass                                   │     │
 │    │    → Quality Gate: All checks pass                              │     │
+│    │                                                                 │     │
+│    │  Phase 11.6: INTER-FEATURE UNIT TESTING (if Feature >= 2)       │     │
+│    │    → Run ALL unit tests from Feature 1 to current               │     │
+│    │    → Verify no regressions (previous features still work)       │     │
+│    │    → Check combined coverage >= 80%                             │     │
+│    │    → Quality Gate: All features' tests pass together            │     │
 │    │                                                                 │     │
 │    │  Mark feature COMPLETE in feature-breakdown.json                │     │
 │    └─────────────────────────────────────────────────────────────────┘     │
 │                                                                             │
 │  end for                                                                    │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  FINAL: INTEGRATION QA (Phase 12)                                   │   │
+│  │    → Full unit test suite across ALL features                       │   │
+│  │    → Integration tests (cross-feature flows)                        │   │
+│  │    → E2E tests (critical user journeys)                             │   │
+│  │    → Regression verification                                        │   │
+│  │    → Security audit                                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -442,8 +457,77 @@ Run quality checks for THIS feature only:
 - Code review
 - Security review (if auth-related)
 - Tests pass
-- Coverage check
-- **Integration test** with previously completed features
+- Coverage check (80%+ for this feature)
+
+### INTER-FEATURE UNIT TESTING (Phase 11.6 - MANDATORY when 2+ features exist)
+
+> **CRITICAL: After completing Feature 2 and beyond, run unit tests to verify feature boundaries.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              INTER-FEATURE UNIT TESTING (After Feature N, N >= 2)           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. RUN ALL UNIT TESTS                                                      │
+│     npm test -- --testPathPattern="unit"                                    │
+│     → All unit tests from Feature 1 to Feature N must pass                  │
+│                                                                             │
+│  2. CHECK NO REGRESSIONS                                                    │
+│     → Feature N did NOT break Feature 1..N-1                                │
+│     → All previous feature tests still pass                                 │
+│                                                                             │
+│  3. VERIFY FEATURE ISOLATION                                                │
+│     → Each feature's tests are independent                                  │
+│     → No test depends on another feature's implementation details           │
+│                                                                             │
+│  4. CHECK SHARED DEPENDENCIES                                               │
+│     → Verify mocks are consistent across features                           │
+│     → Shared utilities work for all features                                │
+│                                                                             │
+│  5. COVERAGE CHECK                                                          │
+│     npm test -- --coverage                                                  │
+│     → Combined coverage must remain >= 80%                                  │
+│     → No feature drops below 80% individual coverage                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Inter-Feature Test Report** (`.specify/features/${FEATURE_ID}/inter-feature-test-report.md`):
+
+```markdown
+# Inter-Feature Unit Test Report
+
+**After Feature**: ${FEATURE_ID} - ${FEATURE_NAME}
+**Completed Features**: ${COMPLETED_FEATURES}
+**Timestamp**: ${TIMESTAMP}
+
+## Unit Test Results
+
+| Feature | Tests | Passed | Failed | Coverage |
+|---------|-------|--------|--------|----------|
+| F-01    | 25    | 25     | 0      | 92%      |
+| F-02    | 30    | 30     | 0      | 88%      |
+| F-03    | 20    | 20     | 0      | 85%      |
+| **Total** | **75** | **75** | **0** | **88%** |
+
+## Regression Check
+- [x] F-01 tests still pass after F-02
+- [x] F-01, F-02 tests still pass after F-03
+
+## Feature Isolation
+- [x] No cross-feature test dependencies
+- [x] Mocks are properly isolated
+
+## Status: PASS / FAIL
+```
+
+**Quality Gate - Inter-Feature Testing:**
+- [30%] All unit tests pass (100% pass rate)
+- [25%] No regressions (previous features' tests still pass)
+- [25%] Coverage >= 80% combined
+- [20%] Feature isolation verified (no cross-dependencies)
+
+**If FAIL:** Fix failing tests before proceeding to next feature.
 
 ### Update Feature Status
 
@@ -483,29 +567,126 @@ After feature QA passes:
 
 ## PHASE 12: INTEGRATION QA (All Projects)
 
-### For COMPLEX Projects
+> **This phase runs AFTER all features are complete. It verifies the system works as a whole.**
 
-Run **integration tests** across all features:
+### For COMPLEX Projects (2+ Features)
 
-```bash
-# Run full test suite
-npm test -- --coverage
-
-# Verify no feature broke another
-npm run test:integration
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    INTEGRATION TESTING PROTOCOL                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  STEP 1: FULL UNIT TEST SUITE                                               │
+│  ───────────────────────────────────────────────────────────────────────────│
+│  npm test -- --testPathPattern="unit" --coverage                           │
+│                                                                             │
+│  Requirements:                                                              │
+│  - ALL unit tests pass (100% pass rate)                                     │
+│  - Combined coverage >= 80%                                                 │
+│  - Each feature maintains >= 80% coverage                                   │
+│                                                                             │
+│  STEP 2: INTEGRATION TESTS                                                  │
+│  ───────────────────────────────────────────────────────────────────────────│
+│  npm test -- --testPathPattern="integration"                               │
+│                                                                             │
+│  Test scenarios:                                                            │
+│  - Cross-feature API flows (e.g., auth → create todo → assign category)    │
+│  - Shared state management                                                  │
+│  - Database transactions spanning features                                  │
+│  - Error propagation across feature boundaries                              │
+│                                                                             │
+│  STEP 3: END-TO-END TESTS (If Applicable)                                   │
+│  ───────────────────────────────────────────────────────────────────────────│
+│  npm run test:e2e                                                          │
+│                                                                             │
+│  Test critical user journeys:                                               │
+│  - Complete user registration → login → use feature → logout               │
+│  - Full CRUD cycles                                                         │
+│  - Error recovery flows                                                     │
+│                                                                             │
+│  STEP 4: REGRESSION VERIFICATION                                            │
+│  ───────────────────────────────────────────────────────────────────────────│
+│  - Verify no feature broke another                                          │
+│  - Check all API contracts still valid                                      │
+│  - Confirm database migrations work together                                │
+│                                                                             │
+│  STEP 5: PERFORMANCE CHECK (Optional)                                       │
+│  ───────────────────────────────────────────────────────────────────────────│
+│  - Response times < 200ms                                                   │
+│  - No memory leaks                                                          │
+│  - Database queries optimized                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Check:
-- All features work together
-- No regressions
-- Cross-feature flows work
+**Integration Test Report** (`.specify/integration-test-report.md`):
+
+```markdown
+# Integration Test Report
+
+**Project**: ${PROJECT_NAME}
+**Features Tested**: ${FEATURE_COUNT}
+**Timestamp**: ${TIMESTAMP}
+
+## Test Summary
+
+| Test Type | Total | Passed | Failed | Skipped |
+|-----------|-------|--------|--------|---------|
+| Unit      | 150   | 150    | 0      | 0       |
+| Integration | 25  | 25     | 0      | 0       |
+| E2E       | 10    | 10     | 0      | 0       |
+| **Total** | **185** | **185** | **0** | **0** |
+
+## Coverage Report
+
+| Feature | Statements | Branches | Functions | Lines |
+|---------|------------|----------|-----------|-------|
+| F-01 Auth | 92% | 88% | 95% | 91% |
+| F-02 Todos | 88% | 82% | 90% | 87% |
+| F-03 Categories | 85% | 80% | 88% | 84% |
+| **Overall** | **88%** | **83%** | **91%** | **87%** |
+
+## Cross-Feature Flows Tested
+
+- [x] User registration → Login → Create Todo → Assign Category
+- [x] Auth token refresh during active session
+- [x] Cascade delete: User → Todos → Category assignments
+- [x] Concurrent operations across features
+
+## Regression Check
+
+- [x] All F-01 tests pass with F-02, F-03, F-04, F-05 code present
+- [x] No API contract changes broke existing features
+- [x] Database schema compatible across all features
+
+## Security Verification
+
+- [x] Auth required on all protected endpoints
+- [x] User isolation verified (can't access other users' data)
+- [x] Rate limiting active
+
+## Status: PASS
+```
+
+**Quality Gate - Integration QA:**
+- [25%] All unit tests pass (100%)
+- [25%] All integration tests pass (100%)
+- [20%] Coverage >= 80% overall
+- [15%] No regressions detected
+- [15%] Security checks pass
 
 ### For SIMPLE Projects
 
-Standard QA:
+Standard QA (same tests, but single feature scope):
 - Code review
 - Security review
-- Full test suite
+- Full unit test suite
+- Build verification
+
+```bash
+npm test -- --coverage
+npm run build
+```
 
 ---
 
@@ -599,8 +780,46 @@ When resuming a COMPLEX project:
 | Constitution | Once | Once |
 | Spec/Plan/Tasks | Once (project) | Per feature |
 | Implementation | All at once | Iterative |
-| QA | Once at end | Per feature + Integration |
+| **Unit Testing** | Once at end | **Per feature + Inter-feature** |
+| **Integration Testing** | With QA | **After ALL features** |
+| QA | Once at end | Per feature + Final Integration |
 | Resume granularity | Phase level | Feature + Phase level |
+
+---
+
+## TESTING STRATEGY SUMMARY
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        TESTING PYRAMID                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                           ┌─────────┐                                       │
+│                          /   E2E    \           ← Phase 12 (Final)          │
+│                         /   Tests    \             Cross-feature journeys   │
+│                        ───────────────                                      │
+│                       /  Integration  \         ← Phase 12 (Final)          │
+│                      /     Tests       \           Feature interactions     │
+│                     ─────────────────────                                   │
+│                    /    Unit Tests       \      ← Phase 11.6 (After each    │
+│                   /   (Inter-Feature)     \        feature 2+)              │
+│                  ───────────────────────────       All features together    │
+│                 /      Unit Tests          \    ← Phase 11 (Per feature)    │
+│                /    (Feature-Specific)      \      TDD: RED→GREEN→REFACTOR  │
+│               ───────────────────────────────                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+WHEN TESTS RUN:
+┌────────────┬──────────────────────────────────────────────────────────────┐
+│ Phase      │ What Tests Run                                               │
+├────────────┼──────────────────────────────────────────────────────────────┤
+│ 11         │ Feature N unit tests (TDD - write first, then implement)     │
+│ 11.5       │ Feature N unit tests (verify implementation)                 │
+│ 11.6       │ ALL unit tests (Feature 1 → N) - catch regressions          │
+│ 12         │ ALL unit + integration + E2E tests                           │
+└────────────┴──────────────────────────────────────────────────────────────┘
+```
 
 ---
 
