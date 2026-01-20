@@ -205,7 +205,8 @@ The workflow automatically detects project complexity:
 | **3. ANALYZE REQUIREMENTS** | Parse requirements file, detect technologies | `requirements-analysis.json` |
 | **4. GAP ANALYSIS** | Compare required vs existing, identify gaps | `gap-analysis.json` |
 | **5. GENERATE** | Create missing skills, agents, hooks | Custom infrastructure |
-| **6. TEST** | Validate all generated components work | Verification report |
+| **6. TEST** | Validate components execute without errors | Functional test report |
+| **6.5. QUALITY VALIDATION** | Score components against quality criteria | Quality validation report |
 | **7. CONSTITUTION** | Define project rules and standards | `.specify/constitution.md` |
 | **7.5. FEATURE BREAKDOWN** | (COMPLEX only) Break project into features | Feature list with dependencies |
 | **8-10. SPEC/PLAN/TASKS** | Per-feature (COMPLEX) or whole project (SIMPLE) | `.specify/spec.md`, `plan.md`, `tasks.md` |
@@ -373,6 +374,39 @@ Every phase is validated by the Quality Gate Teacher before proceeding:
 - Tasks: Granularity, skill mapping, dependency order
 - Implementation: Code quality, test coverage, security
 - Testing: Pass rate, coverage percentage, regression status
+
+### Component Quality Validation (Phase 6.5)
+
+Generated skills, agents, and hooks are validated for **production-readiness** before use:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              COMPONENT QUALITY VALIDATION                                    │
+│                                                                             │
+│  WHO validates?  → component-quality-validator skill                        │
+│  HOW validated?  → Automated quality criteria scoring                       │
+│                                                                             │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐                       │
+│  │   SKILL     │   │   AGENT     │   │   HOOK      │                       │
+│  ├─────────────┤   ├─────────────┤   ├─────────────┤                       │
+│  │ ✓ Triggers  │   │ ✓ Model fit │   │ ✓ JSON valid│                       │
+│  │ ✓ Workflow  │   │ ✓ Min tools │   │ ✓ Bash valid│                       │
+│  │ ✓ Templates │   │ ✓ Clear ins │   │ ✓ Targeted  │                       │
+│  │ ✓ Validation│   │ ✓ Fail plan │   │ ✓ No conflict│                      │
+│  └─────────────┘   └─────────────┘   └─────────────┘                       │
+│         ↓                 ↓                 ↓                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  SCORE: 0-100  →  GRADE: A/B/C/D/F  →  APPROVED or REJECTED         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Rejected Components Regeneration:**
+- Attempt 1: Apply specific fixes from validation report
+- Attempt 2: Simplify scope, focus on core functionality
+- Attempt 3: Use template from similar working component
+- Attempt 4+: Mark MANUAL_REQUIRED, continue with others
 
 ### Phase Artifact Detection
 
@@ -598,7 +632,7 @@ The boilerplate comes with pre-loaded components that work out of the box:
 | **doc-updater** | Update documentation |
 | **test-runner** | Run tests |
 
-### Skills (9)
+### Skills (10)
 
 | Skill | What It Contains |
 |-------|------------------|
@@ -611,6 +645,7 @@ The boilerplate comes with pre-loaded components that work out of the box:
 | **mcp-code-execution** | MCP integration |
 | **skill-gap-analyzer** | Detect missing skills |
 | **workflow-validator** | Check workflow state, detect violations |
+| **component-quality-validator** | Validate generated components are production-ready |
 
 ### Commands (13)
 

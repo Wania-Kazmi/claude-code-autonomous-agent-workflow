@@ -139,8 +139,74 @@ fi
 
 > These phases establish the foundation. They run **ONCE** regardless of project complexity.
 
-### Phase 1-6: Same as before
-(INIT, ANALYZE, REQUIREMENTS, GAP-ANALYSIS, GENERATE, TEST)
+### Phase 1-5: Foundation Phases
+(INIT, ANALYZE PROJECT, ANALYZE REQUIREMENTS, GAP-ANALYSIS, GENERATE)
+
+### Phase 6: COMPONENT TESTING (Functional Validation)
+
+Validate that generated components execute without errors.
+
+### Phase 6.5: COMPONENT QUALITY VALIDATION (NEW - Production Readiness)
+
+> **WHO validates? The component-quality-validator skill.**
+> **HOW? Automated quality criteria scoring.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    PHASE 6.5: COMPONENT QUALITY VALIDATION                   │
+│                                                                             │
+│  FOR EACH generated component (skill, agent, hook):                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  1. VALIDATE structure (frontmatter, sections, syntax)                  ││
+│  │  2. SCORE against quality criteria (0-100)                              ││
+│  │  3. GRADE: A (90+), B (80-89), C (70-79), D (60-69), F (<60)           ││
+│  │  4. DECISION:                                                           ││
+│  │     - A/B/C: APPROVED → Continue                                        ││
+│  │     - D/F: REJECTED → Regenerate (max 3 attempts)                       ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  OUTPUT: .specify/component-validation-report.json                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Quality Criteria by Component Type:**
+
+| Component | Key Criteria |
+|-----------|--------------|
+| **Skill** | Triggers in description, code templates valid, has workflow, has validation checklist |
+| **Agent** | Model appropriate for task, tools minimal, has failure handling, unambiguous instructions |
+| **Hook** | Valid JSON, valid bash syntax, has description, no conflicts |
+
+**Regeneration Protocol:**
+- Attempt 1: Apply specific fixes from validation report
+- Attempt 2: Simplify scope, focus on core functionality
+- Attempt 3: Use template from similar working component
+- Attempt 4+: Mark as MANUAL_REQUIRED, continue with others
+
+**Validation Report Format:**
+```json
+{
+  "phase": "6.5",
+  "components_validated": 5,
+  "results": [
+    {
+      "type": "skill",
+      "name": "express-patterns",
+      "score": 85,
+      "grade": "B",
+      "decision": "APPROVED",
+      "warnings": ["Missing validation section"],
+      "suggestions": ["Add ## Validation section"]
+    }
+  ],
+  "summary": {
+    "approved": 4,
+    "rejected": 1,
+    "regeneration_required": true
+  }
+}
+```
 
 ### Phase 7: CONSTITUTION (Project Ground Rules)
 
