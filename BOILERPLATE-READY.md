@@ -12,32 +12,55 @@ This boilerplate has been prepared for distribution and is ready to use.
 - ✅ `.specify/workflow-state.json` (will be created during workflow)
 - ✅ `.specify/workflow-progress.log` (will be created during workflow)
 - ✅ `.specify/validations/` (will be created during workflow)
+- ✅ `.specify/spec.md`, `.specify/plan.md`, `.specify/tasks.md` (test artifacts)
+- ✅ `.specify/templates/plan.md`, `.specify/templates/spec.md`, `.specify/templates/tasks.md` (duplicate files)
 - ✅ `.claude/logs/*.log` (will be populated during use)
 - ✅ `.claude/build-reports/*.md` (will be created during QA)
 
-### Kept Essential Files
-- ✅ All skills (`.claude/skills/`)
-- ✅ All agents (`.claude/agents/`)
-- ✅ All commands (`.claude/commands/`)
+### Kept Essential Files (Spec-Kit-Plus Pre-Installed)
+- ✅ All skills (`.claude/skills/`) - 15 skills
+- ✅ All agents (`.claude/agents/`) - 13 agents
+- ✅ All commands (`.claude/commands/`) - 29 commands
 - ✅ All hooks (`.claude/hooks.json`, `.claude/settings.json`)
 - ✅ All rules (`.claude/rules/`)
 - ✅ All documentation
+- ✅ Spec-Kit-Plus infrastructure:
+  - `.specify/memory/constitution.md` - Template constitution
+  - `.specify/scripts/bash/` - Utility scripts (7 scripts)
+  - `.specify/templates/` - Workflow templates (7 templates)
 - ✅ Example files (`.specify/todos.example.json`)
 - ✅ Directory structure (`.gitkeep` files)
+
+### Spec-Kit-Plus Pre-Installation Changes
+- ✅ Removed Phase 0.0 initialization code from `sp.autonomous.md`
+- ✅ Changed Phase 0 to verify installation instead of creating directories
+- ✅ Updated all documentation to assume Spec-Kit-Plus is pre-installed
+- ✅ Cleaned up test artifacts (spec.md, plan.md, tasks.md)
+- ✅ Removed duplicate files from templates directory
+- ✅ Verified `.specify/memory/` and `.specify/scripts/` are kept (part of Spec-Kit-Plus)
+
+**What This Means:**
+- `/sp.autonomous` now assumes `.claude/` and `.specify/` already exist
+- No more "initialization failed" errors - framework must be pre-installed
+- Faster startup - skips directory creation phase
+- Cleaner workflow - focuses on analysis and generation
 
 ---
 
 ## 📝 Updated Documentation
 
 ### New Files
-1. **GETTING-STARTED.md** - First-time user guide
+1. **GETTING-STARTED.md** - First-time user guide (updated for pre-installed Spec-Kit-Plus)
 2. **MULTI-USER-COLLABORATION.md** - Team collaboration reference
 3. **todos.example.json** - TODO data structure example
+4. **BOILERPLATE-READY.md** - This file
 
 ### Updated Files
-1. **README.md** - Added first-time setup section and clean slate note
+1. **README.md** - Added first-time setup section, clean slate note, Spec-Kit-Plus prerequisite
 2. **SESSION-RECOVERY.md** - Added note for new users
 3. **.gitignore** - Added session-specific file patterns
+4. **.claude/commands/sp.autonomous.md** - Removed initialization code, assumes pre-installed Spec-Kit-Plus
+5. **GETTING-STARTED.md** - Updated checklist to verify Spec-Kit-Plus installation
 
 ---
 

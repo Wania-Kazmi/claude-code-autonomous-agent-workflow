@@ -11,6 +11,7 @@ Before your first run, verify:
 - [ ] **Claude Code CLI installed**: `claude --version`
 - [ ] **Python 3.8+** (for TODO sync): `python3 --version`
 - [ ] **Git initialized**: Already done in this boilerplate
+- [ ] **Spec-Kit-Plus pre-installed**: `.claude/` and `.specify/` directories exist
 - [ ] **Clean slate confirmed**: No session-specific files exist (fresh start)
 
 ---
@@ -34,12 +35,15 @@ claude "/sp.autonomous requirements/my-app.md"
 ```
 
 This will:
-1. Analyze your requirements
-2. Generate missing skills/agents/hooks
-3. Create project specification
-4. Build implementation plan
-5. Generate code with tests
-6. Run quality reviews
+1. Verify Spec-Kit-Plus installation (must be pre-installed)
+2. Analyze your requirements
+3. Generate missing skills/agents/hooks (if needed)
+4. Create project specification
+5. Build implementation plan
+6. Generate code with tests
+7. Run quality reviews
+
+**Note**: `/sp.autonomous` assumes Spec-Kit-Plus is already installed. The `.claude/` and `.specify/` directories must exist before running this command.
 
 ### Step 3: Resume Work After Days/Weeks
 

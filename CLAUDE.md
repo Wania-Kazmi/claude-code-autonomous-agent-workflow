@@ -17,6 +17,23 @@
 | `/validate-workflow` | Run workflow-validator skill with full quality gate check |
 | `/validate-components` | Check if skills/agents/hooks are production-ready |
 
+### Spec-Kit-Plus Commands (Feature Workflow)
+| Command | What It Does |
+|---------|--------------|
+| `/sp.specify` | Create feature specification from natural language description |
+| `/sp.plan` | Generate technical implementation plan from spec |
+| `/sp.tasks` | Break down plan into actionable tasks |
+| `/sp.implement` | Execute implementation following tasks |
+| `/sp.clarify` | Ask clarifying questions about requirements |
+| `/sp.checklist` | Generate quality checklist for feature |
+| `/sp.constitution` | Create/update project constitution (coding standards, architecture decisions) |
+| `/sp.adr` | Create Architecture Decision Record for significant decisions |
+| `/sp.phr` | Record Prompt History Record (automatic after each interaction) |
+| `/sp.analyze` | Analyze existing codebase structure |
+| `/sp.reverse-engineer` | Generate documentation from existing code |
+| `/sp.git.commit_pr` | Commit changes and create pull request |
+| `/sp.taskstoissues` | Convert tasks to GitHub issues |
+
 ### Development Commands
 | Command | What It Does |
 |---------|--------------|
@@ -187,12 +204,17 @@ Before ANY commit:
 
 ```
 .claude/
-├── agents/           # 9 specialized agents
-├── commands/         # 9 slash commands
+├── agents/           # 13 specialized agents
+├── commands/         # 29 slash commands
 ├── rules/            # 8 governance files
-├── skills/           # Reusable capabilities
+├── skills/           # 15 reusable skills
 ├── hooks.json        # Automation hooks
 └── settings.json     # Permissions and config
+
+.specify/             # Spec-Kit-Plus (pre-installed)
+├── memory/           # Project constitution
+├── scripts/          # Utility scripts (7 scripts)
+└── templates/        # Workflow templates (7 templates)
 
 .mcp.json             # MCP server configuration
 ```
@@ -410,22 +432,457 @@ Last Validation: Phase 10 - Grade B
 
 ---
 
-## Quick Start
+## Spec-Kit-Plus Pre-Installation
+
+**IMPORTANT**: This boilerplate assumes Spec-Kit-Plus is pre-installed.
+
+### What This Means
+
+- `.claude/` and `.specify/` directories already exist with all necessary files
+- `/sp.autonomous` **verifies** installation, doesn't create it
+- No more "initialization failed" errors
+- Faster startup - skips directory creation phase
+
+### Verification
+
+Before running `/sp.autonomous`, verify:
 
 ```bash
-# For a new feature:
+# Check directories exist
+ls -la .claude/
+ls -la .specify/
+
+# Verify scripts are available
+ls -la .specify/scripts/bash/
+
+# Verify templates exist
+ls -la .specify/templates/
+```
+
+If these don't exist, the boilerplate wasn't installed correctly.
+
+---
+
+## Spec-Kit-Plus Workflow System
+
+### The Spec-Driven Development Process
+
+Spec-Kit-Plus enforces a **spec-first** approach where every feature starts with clear requirements before any code is written.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  SPEC-KIT-PLUS FEATURE WORKFLOW                 │
+└─────────────────────────────────────────────────────────────────┘
+
+1. /sp.specify [feature description]
+   ↓
+   Creates: specs/NNN-feature-name/spec.md
+   Branch: NNN-feature-name
+
+2. /sp.clarify (if needed)
+   ↓
+   Asks clarifying questions
+   Updates spec with answers
+
+3. /sp.constitution (first feature only)
+   ↓
+   Creates: .specify/memory/constitution.md
+   Defines: Coding standards, architecture decisions, constraints
+
+4. /sp.plan
+   ↓
+   Creates: specs/NNN-feature-name/plan.md
+   Includes: Architecture, components, implementation phases
+
+5. /sp.adr (when making significant decisions)
+   ↓
+   Creates: history/adr/ADR-NNN-decision-title.md
+   Documents: Context, decision, consequences, alternatives
+
+6. /sp.tasks
+   ↓
+   Creates: specs/NNN-feature-name/tasks.md
+   Breaks down plan into actionable tasks
+
+7. /sp.implement
+   ↓
+   Executes tasks following:
+   - Constitution rules
+   - Plan architecture
+   - ADR decisions
+   - TDD approach (tests first)
+
+8. /sp.git.commit_pr
+   ↓
+   Commits changes and creates PR
+   Links spec, plan, tasks in PR description
+
+9. /sp.phr (automatic)
+   ↓
+   Creates: history/prompts/[stage]/PHR-NNN-title.prompt.md
+   Records: User prompt, AI response, outcomes, learnings
+```
+
+### Knowledge Capture Systems
+
+#### 1. Prompt History Records (PHR)
+
+**Purpose**: Capture every user interaction for learning, traceability, and team knowledge sharing.
+
+**Automatic Creation**: After EVERY user interaction, a PHR is created with:
+- Complete user prompt (verbatim)
+- AI response snapshot
+- Files modified
+- Tests added
+- Outcome and impact
+- Reflections and learnings
+
+**Storage**:
+```
+history/prompts/
+├── constitution/         # Constitution creation sessions
+├── general/             # General discussions
+├── [feature-name]/      # Feature-specific work
+│   ├── PHR-001-initial-spec.prompt.md
+│   ├── PHR-002-clarify-auth.prompt.md
+│   └── PHR-003-implement-login.prompt.md
+```
+
+**PHR Template Fields**:
+```yaml
+---
+id: PHR-001
+title: "Initial User Auth Spec"
+stage: spec  # constitution|spec|plan|tasks|red|green|refactor|explainer|misc
+date: 2026-01-22
+surface: cli  # cli|api|web
+model: sonnet-4.5
+feature: user-auth
+branch: 001-user-auth
+command: /sp.specify
+labels: [authentication, security]
+links:
+  spec: specs/001-user-auth/spec.md
+  adr: history/adr/ADR-001-oauth-choice.md
+files:
+  - src/auth/login.ts
+  - tests/auth/login.test.ts
+tests:
+  - ✅ Login with valid credentials
+  - ✅ Reject invalid credentials
+---
+
+## Prompt
+[User's exact input - never truncated]
+
+## Response snapshot
+[AI's response - key points]
+
+## Outcome
+- ✅ Impact: Created auth spec with OAuth2 integration
+- 🧪 Tests: 5 test scenarios defined
+- 📁 Files: spec.md created
+- 🔁 Next prompts: /sp.plan to create implementation plan
+- 🧠 Reflection: User wanted social login - clarified OAuth2 vs custom
+```
+
+#### 2. Architecture Decision Records (ADR)
+
+**Purpose**: Document significant architectural and technical decisions.
+
+**When to Create**:
+- Technology/framework selection (e.g., choosing Next.js over Remix)
+- Architecture patterns (e.g., microservices vs monolith)
+- Database decisions (e.g., PostgreSQL vs MongoDB)
+- Authentication strategies (e.g., JWT vs sessions)
+- Security approaches
+- Performance optimizations
+- Any decision that:
+  - Impacts how engineers write code
+  - Has notable tradeoffs
+  - Will likely be questioned later
+
+**Storage**:
+```
+history/adr/
+├── ADR-001-frontend-stack.md
+├── ADR-002-auth-strategy.md
+├── ADR-003-state-management.md
+└── README.md  # Index of all ADRs
+```
+
+**ADR Template**:
+```markdown
+# ADR-001: Choose Frontend Technology Stack
+
+## Status
+Proposed | Accepted | Deprecated | Superseded
+
+## Context
+[What is the issue we're addressing? What constraints exist?]
+
+We need to choose a frontend framework for the new web application.
+Constraints:
+- Team has React experience
+- Need server-side rendering for SEO
+- Deploy to Vercel
+- TypeScript required
+
+## Decision
+[What decision did we make?]
+
+We will use **Next.js 14** with:
+- Framework: Next.js 14 (App Router)
+- Styling: Tailwind CSS v3
+- Deployment: Vercel
+- State: React Context + SWR for data fetching
+
+## Consequences
+[What outcomes result from this decision?]
+
+**Positive**:
+- Built-in SSR/SSG support
+- Great developer experience
+- Vercel integration is seamless
+- Strong TypeScript support
+
+**Negative**:
+- Locked into React ecosystem
+- App Router is relatively new (learning curve)
+- Vercel vendor lock-in
+
+**Neutral**:
+- File-based routing (team needs to learn conventions)
+
+## Alternatives Considered
+[What other options did we evaluate?]
+
+1. **Remix + Cloudflare**
+   - Pros: Modern patterns, edge deployment
+   - Cons: Smaller ecosystem, team unfamiliar
+
+2. **Astro + React islands**
+   - Pros: Performance, flexibility
+   - Cons: Less mature, overkill for our needs
+
+## References
+- Next.js 14 Documentation: https://nextjs.org/docs
+- Related spec: specs/001-web-app/spec.md
+- Related plan: specs/001-web-app/plan.md
+```
+
+**Automatic ADR Suggestion**: When `/sp.plan` completes, Claude analyzes the plan and suggests ADRs for any architecturally significant decisions detected.
+
+### Constitution System
+
+**Purpose**: Define project-wide rules, standards, and constraints that ALL features must follow.
+
+**Created**: Before first feature implementation (automatically via `/sp.constitution`)
+
+**Location**: `.specify/memory/constitution.md`
+
+**What It Contains**:
+```markdown
+# Project Constitution
+
+## Core Principles
+1. Security-first development
+2. Test-driven development (80%+ coverage)
+3. Immutable data patterns
+4. Progressive enhancement
+
+## Coding Standards
+- TypeScript strict mode enabled
+- ESLint + Prettier enforced
+- 200-400 lines per file (800 max)
+- Functional components only (React)
+
+## Architecture Decisions
+- Monorepo structure (Turborepo)
+- PostgreSQL for persistence
+- Redis for caching
+- Next.js for frontend
+- tRPC for API layer
+
+## Technology Constraints
+### Required
+- Node.js 20+
+- TypeScript 5+
+- React 18+
+
+### Forbidden
+- Class components
+- Any DB other than PostgreSQL
+- Direct DOM manipulation
+
+## Quality Gates
+- 80% test coverage minimum
+- Zero TypeScript errors
+- Zero ESLint errors
+- All PRs require code review
+- Security review for auth/payment code
+
+## Out of Scope
+- Mobile apps (web-only for now)
+- Real-time features (future phase)
+- Multi-tenancy (single tenant v1)
+```
+
+**Usage**: Every `/sp.implement` phase reads the constitution and enforces its rules during implementation.
+
+### Directory Structure for Features
+
+```
+project-root/
+├── .claude/                    # Claude Code config (pre-installed)
+├── .specify/                   # Spec-Kit-Plus (pre-installed)
+│   ├── memory/
+│   │   └── constitution.md    # Project-wide rules
+│   ├── scripts/               # Utility bash scripts
+│   └── templates/             # Templates for spec/plan/tasks
+│
+├── specs/                     # Feature specifications
+│   ├── 001-user-auth/
+│   │   ├── spec.md           # Requirements
+│   │   ├── plan.md           # Technical plan
+│   │   ├── tasks.md          # Implementation tasks
+│   │   └── prompts/          # Feature-specific PHRs
+│   │       ├── PHR-001-initial-spec.prompt.md
+│   │       └── PHR-002-clarify-oauth.prompt.md
+│   │
+│   └── 002-dashboard/
+│       ├── spec.md
+│       ├── plan.md
+│       └── tasks.md
+│
+├── history/
+│   ├── adr/                   # Architecture Decision Records
+│   │   ├── ADR-001-frontend-stack.md
+│   │   ├── ADR-002-auth-strategy.md
+│   │   └── README.md
+│   │
+│   └── prompts/               # Cross-cutting PHRs
+│       ├── constitution/
+│       ├── general/
+│       └── [feature-name]/
+│
+└── src/                       # Actual implementation
+    ├── auth/
+    ├── dashboard/
+    └── ...
+```
+
+### Best Practices
+
+#### Starting a New Feature
+```bash
+# 1. Create spec from natural language
+/sp.specify I want to add user authentication with OAuth2 and email/password
+
+# 2. If anything unclear, clarify
+/sp.clarify
+
+# 3. Create constitution (first feature only)
+/sp.constitution
+
+# 4. Generate implementation plan
+/sp.plan
+
+# 5. Document significant decisions
+/sp.adr
+
+# 6. Break into tasks
+/sp.tasks
+
+# 7. Implement with TDD
+/sp.implement
+
+# 8. Commit and create PR
+/sp.git.commit_pr
+```
+
+#### Resuming Interrupted Work
+```bash
+# Check current state
+/q-status
+
+# Validate workflow integrity
+/q-validate
+
+# Continue autonomous build (resumes automatically)
+/sp.autonomous requirements.md
+```
+
+#### Knowledge Retrieval
+```bash
+# Find relevant PHRs
+grep -r "authentication" history/prompts/
+
+# Review ADRs
+cat history/adr/README.md
+
+# Check constitution
+cat .specify/memory/constitution.md
+```
+
+---
+
+## Quick Start
+
+### Option 1: Spec-Kit-Plus Feature Workflow (Recommended)
+```bash
+# Create feature spec
+/sp.specify Add user authentication with OAuth2 and email/password
+
+# Generate implementation plan
+/sp.plan
+
+# Break into tasks
+/sp.tasks
+
+# Implement with TDD
+/sp.implement
+
+# Commit and create PR
+/sp.git.commit_pr
+```
+
+### Option 2: Direct Development Workflow
+```bash
+# Plan first
 /plan I want to add [feature description]
 
-# Wait for approval, then:
+# Wait for approval, then implement with TDD
 /tdd
 
-# After implementation:
+# Review code
 /code-review
 
-# If build fails:
+# Fix any build errors
 /build-fix
-
-# For autonomous build with session recovery:
-/sp.autonomous requirements.md
-# (Can resume after interruption)
 ```
+
+### Option 3: Full Autonomous Build
+```bash
+# From requirements file (supports session recovery)
+/sp.autonomous requirements.md
+
+# Can resume after interruption - just run again
+/sp.autonomous requirements.md
+```
+
+---
+
+## Key Differences: Spec-Kit-Plus vs Direct Development
+
+| Aspect | Spec-Kit-Plus (`/sp.*`) | Direct Development |
+|--------|-------------------------|-------------------|
+| **Approach** | Spec-first, structured workflow | Ad-hoc, immediate coding |
+| **Documentation** | Automatic (spec, plan, tasks, PHRs, ADRs) | Manual (if at all) |
+| **Knowledge Capture** | Every interaction recorded | Nothing captured |
+| **Team Collaboration** | Full traceability, shared context | Tribal knowledge |
+| **Session Recovery** | Built-in via workflow state | Not supported |
+| **Quality Gates** | Enforced at every phase | Manual |
+| **Best For** | Complex features, team projects | Quick fixes, experiments |
+
+**Recommendation**: Use Spec-Kit-Plus (`/sp.*` commands) for all production features. Use direct development only for quick experiments or one-off scripts.

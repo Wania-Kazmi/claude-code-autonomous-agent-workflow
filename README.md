@@ -244,13 +244,16 @@ claude "/sp.autonomous requirements/my-app.md"
 
 ## ⚙️ The Spec-Kit-Plus Workflow
 
+**PREREQUISITE**: Spec-Kit-Plus must be pre-installed (`.claude/` and `.specify/` directories with templates and scripts).
+
 When you run `/sp.autonomous`, this workflow executes:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         SPEC-KIT-PLUS WORKFLOW                              │
+│                       (Assumes Pre-Installed Framework)                     │
 │                                                                             │
-│  INIT → ANALYZE PROJECT → ANALYZE REQUIREMENTS → GAP ANALYSIS              │
+│  VERIFY → ANALYZE PROJECT → ANALYZE REQUIREMENTS → GAP ANALYSIS            │
 │                                                       ↓                     │
 │                                          GENERATE → TEST → VERIFY           │
 │                                                            ↓                │

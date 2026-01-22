@@ -192,103 +192,51 @@ GENERATED SKILLS (created during build, use Read):
 
 ---
 
-## PHASE 0: PRE-CHECK & INITIALIZATION (ALWAYS RUNS)
+## PHASE 0: PRE-CHECK (ALWAYS RUNS)
 
-> **Initializes project structure if needed, detects current state, determines complexity, decides whether to start fresh or resume.**
+> **PREREQUISITE**: Spec-Kit-Plus must be pre-installed. The workflow assumes `.claude/` and `.specify/` directories already exist with all necessary templates, scripts, and configurations.
 
-### Step 0.0: Project Initialization (CRITICAL - RUN FIRST)
+> **Detects current state, determines complexity, decides whether to start fresh or resume.**
 
-**CRITICAL RULES:**
-1. **NEVER create directories outside the project root**
-2. **NEVER create `skill-lab`, `workspace`, or any other working directories**
-3. **ALWAYS use existing `.claude/` if it exists**
-4. **ALWAYS use existing `.specify/` if it exists**
-5. **Skills go in `.claude/skills/` - NOWHERE ELSE**
+### Step 0.0: Verify Spec-Kit-Plus Installation
 
-**0.0.1 Initialize Git Branch (FIRST STEP):**
+**CRITICAL**: This workflow requires Spec-Kit-Plus to be pre-installed. If you don't have it installed, the autonomous build will FAIL.
 
-```bash
-# CRITICAL: Initialize project branch BEFORE anything else
-# This ensures all work happens on a feature branch, not main/master
-bash .claude/scripts/init-project-branch.sh $(basename $(pwd))
-```
-
-**What This Does:**
-- Checks if you're on `main` or `master` branch
-- Automatically creates `feature/{project-name}` branch if on main/master
-- Switches to the feature branch for all autonomous work
-- Sets up remote tracking if origin exists
-
-**Check existing structure SECOND:**
+**Verify installation:**
 
 ```bash
 echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║              SPEC-KIT-PLUS INITIALIZATION                      ║"
+echo "║         SPEC-KIT-PLUS PRE-CHECK (Assumes Pre-Installed)       ║"
 echo "╠════════════════════════════════════════════════════════════════╣"
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# CRITICAL: Check what ALREADY EXISTS before doing ANYTHING
-# ═══════════════════════════════════════════════════════════════════════════════
+# Verify required directories exist
+if [ ! -d ".claude" ] || [ ! -d ".specify" ]; then
+    echo "║  ✗ ERROR: Spec-Kit-Plus not installed                         ║"
+    echo "║  ✗ Missing .claude/ or .specify/ directories                  ║"
+    echo "║                                                                ║"
+    echo "║  Please install Spec-Kit-Plus before running /sp.autonomous   ║"
+    echo "╚════════════════════════════════════════════════════════════════╝"
+    exit 1
+fi
 
-CLAUDE_EXISTS="false"
-SPECIFY_EXISTS="false"
-SKILLS_EXIST="false"
+# Check existing skills
 SKILL_COUNT=0
-
-# Check .claude directory
-if [ -d ".claude" ]; then
-    CLAUDE_EXISTS="true"
-    echo "║  ✓ .claude/ directory EXISTS - will use it                    ║"
-
-    # Check for existing skills
-    if [ -d ".claude/skills" ]; then
-        SKILL_COUNT=$(find .claude/skills -name "SKILL.md" 2>/dev/null | wc -l)
-        if [ "$SKILL_COUNT" -gt 0 ]; then
-            SKILLS_EXIST="true"
-            echo "║  ✓ Found $SKILL_COUNT existing skills - will REUSE them           ║"
-        fi
-    fi
+if [ -d ".claude/skills" ]; then
+    SKILL_COUNT=$(find .claude/skills -name "SKILL.md" 2>/dev/null | wc -l)
 fi
 
-# Check .specify directory
-if [ -d ".specify" ]; then
-    SPECIFY_EXISTS="true"
-    echo "║  ✓ .specify/ directory EXISTS - will use it                   ║"
+# Verify scripts exist
+if [ ! -f ".specify/scripts/bash/check-prerequisites.sh" ]; then
+    echo "║  ✗ ERROR: Spec-Kit-Plus scripts not found                     ║"
+    echo "║  ✗ Missing .specify/scripts/bash/check-prerequisites.sh       ║"
+    echo "╚════════════════════════════════════════════════════════════════╝"
+    exit 1
 fi
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Only create directories if they DON'T exist
-# ═══════════════════════════════════════════════════════════════════════════════
-
-if [ "$SPECIFY_EXISTS" = "false" ]; then
-    echo "║  Creating .specify/ directory structure...                    ║"
-    mkdir -p .specify/templates
-    mkdir -p .specify/validations
-    mkdir -p .specify/features
-    echo '{"phase": 0, "status": "initialized", "timestamp": "'$(date -Iseconds)'"}' > .specify/workflow-state.json
-    echo "║  ✓ Created .specify/                                          ║"
-fi
-
-if [ "$CLAUDE_EXISTS" = "false" ]; then
-    echo "║  Creating .claude/ directory structure...                     ║"
-    mkdir -p .claude/skills
-    mkdir -p .claude/agents
-    mkdir -p .claude/commands
-    mkdir -p .claude/rules
-    mkdir -p .claude/logs
-    mkdir -p .claude/build-reports
-    echo "║  ✓ Created .claude/                                           ║"
-else
-    # Only create subdirectories that don't exist
-    [ ! -d ".claude/logs" ] && mkdir -p .claude/logs
-    [ ! -d ".claude/build-reports" ] && mkdir -p .claude/build-reports
-fi
-
-echo "╠════════════════════════════════════════════════════════════════╣"
-echo "║  SUMMARY:                                                       ║"
-echo "║  - .claude exists: $CLAUDE_EXISTS                                      ║"
-echo "║  - .specify exists: $SPECIFY_EXISTS                                     ║"
-echo "║  - Existing skills: $SKILL_COUNT                                         ║"
+echo "║  ✓ Spec-Kit-Plus detected and ready                           ║"
+echo "║  ✓ .claude/ directory exists                                  ║"
+echo "║  ✓ .specify/ directory exists with scripts                    ║"
+echo "║  ✓ Found $SKILL_COUNT existing skills                                 ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 ```
 
@@ -304,6 +252,7 @@ echo "╚═══════════════════════�
 ║  ✗ NEVER create: nested skills directories                                     ║
 ║  ✗ NEVER ignore existing .claude/skills/ contents                              ║
 ║  ✗ NEVER regenerate skills that already exist                                  ║
+║  ✗ NEVER try to install or initialize Spec-Kit-Plus (it's pre-installed)      ║
 ║                                                                                ║
 ║  IF .claude/skills/ EXISTS WITH SKILLS:                                        ║
 ║    → SKIP Phase 5 (GENERATE) entirely                                          ║
@@ -313,32 +262,30 @@ echo "╚═══════════════════════�
 ╚════════════════════════════════════════════════════════════════════════════════╝
 ```
 
-**Directory Structure Created:**
+**Expected Directory Structure (Pre-Installed):**
 ```
 .specify/
+├── memory/             # Project constitution
+├── scripts/            # Bash utility scripts
+│   └── bash/
+│       ├── check-prerequisites.sh
+│       ├── create-phr.sh
+│       └── create-adr.sh
 ├── templates/          # Spec templates
 ├── validations/        # Validation reports
 ├── features/           # Feature-specific specs (COMPLEX projects)
 └── workflow-state.json # Current workflow state
 
 .claude/
-├── skills/            # Custom skills (generated)
+├── skills/            # Custom skills (pre-loaded + generated)
 ├── agents/            # Agent definitions
-├── commands/          # Slash commands
+├── commands/          # Slash commands (including sp.autonomous)
 ├── rules/             # Governance rules
 ├── logs/              # Activity logs
 └── build-reports/     # Build reports
 ```
 
-### Step 0.1: Invoke Workflow Validator
-
-```bash
-echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║              SPEC-KIT-PLUS PRE-CHECK v2.0                      ║"
-echo "╠════════════════════════════════════════════════════════════════╣"
-```
-
-### Step 0.2: Detect Current Phase
+### Step 0.1: Detect Current Phase
 
 Check artifacts to determine current phase:
 
@@ -365,7 +312,7 @@ else
 fi
 ```
 
-### Step 0.3: Resume or Start Fresh
+### Step 0.2: Resume or Start Fresh
 
 **→ Continue to appropriate phase based on state.**
 
@@ -377,12 +324,16 @@ fi
 
 ### Phase 1: INIT (Directory Setup)
 
-**SKIP IF:** `.claude/` and `.specify/` already exist.
+**ALWAYS SKIP** - Spec-Kit-Plus is pre-installed with all necessary directories.
 
-```bash
-# Already handled in Phase 0.0
-# DO NOT create any new directories here
-```
+`.claude/` and `.specify/` directories should already exist with:
+- Templates in `.specify/templates/`
+- Scripts in `.specify/scripts/bash/`
+- Skills in `.claude/skills/`
+- Agents in `.claude/agents/`
+- Commands in `.claude/commands/`
+
+**DO NOT create any directories in this phase.**
 
 ### Phase 2-3: ANALYZE PROJECT & REQUIREMENTS
 
