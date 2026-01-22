@@ -110,6 +110,35 @@ When you start a new autonomous build:
 
 This ensures best practices: all development happens on feature branches, keeping your main branch clean.
 
+### Session Recovery - TODO Persistence
+
+**Problem Solved:** TODOs are now saved across conversation sessions!
+
+When you start a **new conversation** (days/weeks later):
+
+1. Run: `bash .claude/scripts/resume-work.sh`
+2. See all your saved TODOs from the last session
+3. Ask Claude to restore them to your new session
+
+**How It Works:**
+- TODOs automatically save to `.specify/todos.json` when session ends
+- Persists across different conversations in the same project
+- No more lost context when starting fresh conversations
+
+**Quick Commands:**
+```bash
+# Resume work and see saved TODOs
+bash .claude/scripts/resume-work.sh
+
+# Check TODO status
+python3 .claude/scripts/sync-todos.py status
+
+# Manually save TODOs
+python3 .claude/scripts/sync-todos.py save
+```
+
+See [`.claude/docs/SESSION-RECOVERY.md`](.claude/docs/SESSION-RECOVERY.md) for full documentation.
+
 ---
 
 ## 🚀 Quick Start
