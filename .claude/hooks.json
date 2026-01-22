@@ -3,6 +3,16 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "tool == \"Bash\" && tool_input.command matches \"mkdir.*skill-lab|mkdir.*workspace|mkdir.*temp[^l]|mkdir.*output\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\necho '[Hook] BLOCKED: Forbidden directory creation' >&2\necho '[Hook] Cannot create: skill-lab/, workspace/, temp/, output/' >&2\necho '[Hook] Use .claude/skills/ for skills' >&2\necho '[Hook] Use .specify/ for workflow files' >&2\nexit 1"
+          }
+        ],
+        "description": "Block creation of forbidden directories (skill-lab, workspace, etc.)"
+      },
+      {
         "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)\"",
         "hooks": [
           {
@@ -31,6 +41,26 @@
           }
         ],
         "description": "Pause before git push to review changes"
+      },
+      {
+        "matcher": "tool == \"Write\" && tool_input.file_path matches \"skill-lab|workspace/|temp/|output/\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\necho \"[Hook] BLOCKED: Cannot write to forbidden directory\" >&2\necho \"[Hook] File: $file_path\" >&2\necho \"[Hook] Use .claude/skills/ or .specify/ instead\" >&2\nexit 1"
+          }
+        ],
+        "description": "Block writing files to forbidden directories"
+      },
+      {
+        "matcher": "tool == \"Write\" && tool_input.file_path matches \"SKILL\\\\.md\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nSKILL_COUNT=$(find .claude/skills -name 'SKILL.md' 2>/dev/null | wc -l)\nif [ \"$SKILL_COUNT\" -ge 15 ]; then\n  echo \"[Hook] WARNING: Project has $SKILL_COUNT skills\" >&2\n  echo \"[Hook] Consider consolidating skills before creating new ones\" >&2\nfi\necho \"$input\""
+          }
+        ],
+        "description": "Warn when creating skills if count >= 15"
       },
       {
         "matcher": "tool == \"Write\" && tool_input.file_path matches \"\\\\.(md|txt)$\" && !(tool_input.file_path matches \"README\\\\.md|CLAUDE\\\\.md|AGENTS\\\\.md|CONTRIBUTING\\\\.md\")",
