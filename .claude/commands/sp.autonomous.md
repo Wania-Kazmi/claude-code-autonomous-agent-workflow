@@ -192,9 +192,129 @@ GENERATED SKILLS (created during build, use Read):
 
 ---
 
-## PHASE 0: PRE-CHECK (ALWAYS RUNS)
+## PHASE 0: PRE-CHECK & INITIALIZATION (ALWAYS RUNS)
 
-> **Detects current state, determines complexity, decides whether to start fresh or resume.**
+> **Initializes project structure if needed, detects current state, determines complexity, decides whether to start fresh or resume.**
+
+### Step 0.0: Project Initialization (CRITICAL - RUN FIRST)
+
+**CRITICAL RULES:**
+1. **NEVER create directories outside the project root**
+2. **NEVER create `skill-lab`, `workspace`, or any other working directories**
+3. **ALWAYS use existing `.claude/` if it exists**
+4. **ALWAYS use existing `.specify/` if it exists**
+5. **Skills go in `.claude/skills/` - NOWHERE ELSE**
+
+**Check existing structure FIRST:**
+
+```bash
+echo "╔════════════════════════════════════════════════════════════════╗"
+echo "║              SPEC-KIT-PLUS INITIALIZATION                      ║"
+echo "╠════════════════════════════════════════════════════════════════╣"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CRITICAL: Check what ALREADY EXISTS before doing ANYTHING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CLAUDE_EXISTS="false"
+SPECIFY_EXISTS="false"
+SKILLS_EXIST="false"
+SKILL_COUNT=0
+
+# Check .claude directory
+if [ -d ".claude" ]; then
+    CLAUDE_EXISTS="true"
+    echo "║  ✓ .claude/ directory EXISTS - will use it                    ║"
+
+    # Check for existing skills
+    if [ -d ".claude/skills" ]; then
+        SKILL_COUNT=$(find .claude/skills -name "SKILL.md" 2>/dev/null | wc -l)
+        if [ "$SKILL_COUNT" -gt 0 ]; then
+            SKILLS_EXIST="true"
+            echo "║  ✓ Found $SKILL_COUNT existing skills - will REUSE them           ║"
+        fi
+    fi
+fi
+
+# Check .specify directory
+if [ -d ".specify" ]; then
+    SPECIFY_EXISTS="true"
+    echo "║  ✓ .specify/ directory EXISTS - will use it                   ║"
+fi
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Only create directories if they DON'T exist
+# ═══════════════════════════════════════════════════════════════════════════════
+
+if [ "$SPECIFY_EXISTS" = "false" ]; then
+    echo "║  Creating .specify/ directory structure...                    ║"
+    mkdir -p .specify/templates
+    mkdir -p .specify/validations
+    mkdir -p .specify/features
+    echo '{"phase": 0, "status": "initialized", "timestamp": "'$(date -Iseconds)'"}' > .specify/workflow-state.json
+    echo "║  ✓ Created .specify/                                          ║"
+fi
+
+if [ "$CLAUDE_EXISTS" = "false" ]; then
+    echo "║  Creating .claude/ directory structure...                     ║"
+    mkdir -p .claude/skills
+    mkdir -p .claude/agents
+    mkdir -p .claude/commands
+    mkdir -p .claude/rules
+    mkdir -p .claude/logs
+    mkdir -p .claude/build-reports
+    echo "║  ✓ Created .claude/                                           ║"
+else
+    # Only create subdirectories that don't exist
+    [ ! -d ".claude/logs" ] && mkdir -p .claude/logs
+    [ ! -d ".claude/build-reports" ] && mkdir -p .claude/build-reports
+fi
+
+echo "╠════════════════════════════════════════════════════════════════╣"
+echo "║  SUMMARY:                                                       ║"
+echo "║  - .claude exists: $CLAUDE_EXISTS                                      ║"
+echo "║  - .specify exists: $SPECIFY_EXISTS                                     ║"
+echo "║  - Existing skills: $SKILL_COUNT                                         ║"
+echo "╚════════════════════════════════════════════════════════════════╝"
+```
+
+### FORBIDDEN ACTIONS (NEVER DO THESE)
+
+```
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                           FORBIDDEN ACTIONS                                     ║
+╠════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                ║
+║  ✗ NEVER create: skill-lab/, workspace/, temp/, output/                        ║
+║  ✗ NEVER create: .claude/ inside another directory                             ║
+║  ✗ NEVER create: nested skills directories                                     ║
+║  ✗ NEVER ignore existing .claude/skills/ contents                              ║
+║  ✗ NEVER regenerate skills that already exist                                  ║
+║                                                                                ║
+║  IF .claude/skills/ EXISTS WITH SKILLS:                                        ║
+║    → SKIP Phase 5 (GENERATE) entirely                                          ║
+║    → USE existing skills in Phase 11 (IMPLEMENT)                               ║
+║    → DO NOT create duplicates                                                  ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+```
+
+**Directory Structure Created:**
+```
+.specify/
+├── templates/          # Spec templates
+├── validations/        # Validation reports
+├── features/           # Feature-specific specs (COMPLEX projects)
+└── workflow-state.json # Current workflow state
+
+.claude/
+├── skills/            # Custom skills (generated)
+├── agents/            # Agent definitions
+├── commands/          # Slash commands
+├── rules/             # Governance rules
+├── logs/              # Activity logs
+└── build-reports/     # Build reports
+```
 
 ### Step 0.1: Invoke Workflow Validator
 
@@ -241,8 +361,86 @@ fi
 
 > These phases establish the foundation. They run **ONCE** regardless of project complexity.
 
-### Phase 1-5: Foundation Phases
-(INIT, ANALYZE PROJECT, ANALYZE REQUIREMENTS, GAP-ANALYSIS, GENERATE)
+### Phase 1: INIT (Directory Setup)
+
+**SKIP IF:** `.claude/` and `.specify/` already exist.
+
+```bash
+# Already handled in Phase 0.0
+# DO NOT create any new directories here
+```
+
+### Phase 2-3: ANALYZE PROJECT & REQUIREMENTS
+
+Analyze the project structure and requirements file.
+
+### Phase 4: GAP ANALYSIS
+
+**SKIP IF:** `.specify/gap-analysis.json` exists OR existing skills match requirements.
+
+Identify what skills/agents/hooks are missing.
+
+### Phase 5: GENERATE (Skill Creation)
+
+**⚠️ CRITICAL: SKIP CONDITIONS**
+
+```python
+def should_skip_phase_5():
+    """
+    SKIP Phase 5 if skills already exist.
+    DO NOT regenerate or create duplicates.
+    """
+
+    # Check existing skills
+    skill_count = count_files(".claude/skills/*/SKILL.md")
+
+    # If 5+ skills exist, SKIP generation
+    if skill_count >= 5:
+        print(f"SKIPPING Phase 5: Found {skill_count} existing skills")
+        print("Using existing skills in .claude/skills/")
+        return True
+
+    # If gap-analysis shows no gaps, SKIP
+    if Path(".specify/gap-analysis.json").exists():
+        gaps = json.load(open(".specify/gap-analysis.json"))
+        if len(gaps.get("missing_skills", [])) == 0:
+            print("SKIPPING Phase 5: No skill gaps identified")
+            return True
+
+    return False
+```
+
+**If Phase 5 runs:**
+- Create skills ONLY in `.claude/skills/` (NOWHERE ELSE)
+- DO NOT create: `skill-lab/`, `workspace/`, `output/`, or any other directory
+- DO NOT create nested `.claude/` directories
+- VERIFY skill location before writing:
+  ```python
+  def safe_create_skill(skill_name: str):
+      """Create skill in correct location."""
+
+      # CORRECT path
+      path = f".claude/skills/{skill_name}/SKILL.md"
+
+      # FORBIDDEN paths - NEVER use these
+      forbidden = [
+          "skill-lab/",
+          "workspace/",
+          "output/",
+          ".claude/.claude/",  # Nested!
+          "../",              # Parent directory
+      ]
+
+      for f in forbidden:
+          if f in path:
+              raise ValueError(f"FORBIDDEN: Cannot create skill in {path}")
+
+      # Safe to create
+      os.makedirs(os.path.dirname(path), exist_ok=True)
+      write_file(path, content)
+  ```
+
+### Phase 1-5 Summary
 
 ### Phase 6: COMPONENT TESTING (Functional Validation)
 

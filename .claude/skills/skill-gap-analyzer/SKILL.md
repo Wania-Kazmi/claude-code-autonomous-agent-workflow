@@ -53,12 +53,37 @@ Scan for these keywords and mark detected:
 ls -la .claude/skills/
 ```
 
-### Step D: Create Missing Skills
+### Step D: Create Missing Skills (WITH GUARDRAILS)
+
+**⚠️ CRITICAL RULES:**
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  SKILL CREATION RULES - NEVER VIOLATE                                      ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║  ✓ ONLY create skills in: .claude/skills/{name}/SKILL.md                  ║
+║  ✗ NEVER create: skill-lab/, workspace/, temp/, output/                   ║
+║  ✗ NEVER create: .claude/ inside another directory                        ║
+║  ✗ NEVER create: nested directories like .claude/.claude/                 ║
+║  ✗ NEVER overwrite existing skills - SKIP if exists                       ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
 For EACH detected technology that doesn't have a skill:
 
-1. Create directory: `mkdir -p .claude/skills/{tech}-patterns`
-2. Create SKILL.md with the template below
-3. Add technology-specific content
+1. **CHECK if skill exists first:**
+   ```bash
+   if [ -f ".claude/skills/{tech}-patterns/SKILL.md" ]; then
+       echo "SKIP: {tech}-patterns already exists"
+       continue
+   fi
+   ```
+
+2. Create directory: `mkdir -p .claude/skills/{tech}-patterns`
+   - ONLY in `.claude/skills/` - NOWHERE else
+
+3. Create SKILL.md with the template below
+
+4. Add technology-specific content
 
 ### Step E: Generate Report
 Create `.specify/skill-gap-report.json` with results
