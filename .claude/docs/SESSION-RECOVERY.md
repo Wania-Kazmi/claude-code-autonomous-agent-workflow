@@ -1,5 +1,7 @@
 # Session Recovery - TODO Persistence Across Conversations
 
+> **For New Users**: If this is your first time using this boilerplate, you won't have any saved TODOs yet. The system will create `.specify/todos.json` when you first use the TodoWrite tool. This documentation describes how TODOs persist once you've created them.
+
 ## Problem
 
 When you start a **new conversation** in Claude Code (not resume an existing one), your TODO list doesn't carry over because:
@@ -8,12 +10,13 @@ When you start a **new conversation** in Claude Code (not resume an existing one
 - New conversations get new session IDs
 - No cross-session TODO persistence existed
 
-## Solution: Project-Level TODO Persistence
+## Solution: Project-Level TODO Persistence with Multi-User Collaboration
 
-We've implemented a **dual-storage system**:
+We've implemented a **dual-storage system** with **intelligent merge support**:
 
 1. **Session-level** - Normal Claude Code behavior (`~/.claude/todos/`)
 2. **Project-level** - New system (`.specify/todos.json` in your project)
+3. **Multi-User Support** - Multiple developers/sessions can collaborate on the same TODO list
 
 ### How It Works
 
@@ -126,6 +129,52 @@ python3 .claude/scripts/sync-todos.py status
   Completed: 3 | In Progress: 1 | Pending: 3
 ```
 
+#### Show Contributors
+
+```bash
+python3 .claude/scripts/sync-todos.py contributors
+```
+
+**When to use:** See which sessions/users have contributed to the TODO list.
+
+**Output:**
+```
+╔════════════════════════════════════════════════════════════════╗
+║                  TODO CONTRIBUTORS                             ║
+╠════════════════════════════════════════════════════════════════╣
+║  Total Contributors: 3
+╠════════════════════════════════════════════════════════════════╣
+║  📝 5e4022cb-2d6...
+║     Created: 5 | Contributed: 7
+║  📝 a7f3b91c-8e2...
+║     Created: 2 | Contributed: 3
+║  📝 c9d1e5f2-4a6...
+║     Created: 3 | Contributed: 5
+╚════════════════════════════════════════════════════════════════╝
+```
+
+#### Show History
+
+```bash
+python3 .claude/scripts/sync-todos.py history
+```
+
+**When to use:** View historical snapshots of TODO changes.
+
+**Output:**
+```
+╔════════════════════════════════════════════════════════════════╗
+║                    TODO HISTORY                                ║
+╠════════════════════════════════════════════════════════════════╣
+║  1. 2026-01-22T16:30:00
+║     Session: 5e4022cb-2d6... | TODOs: 10
+║  2. 2026-01-22T14:15:00
+║     Session: a7f3b91c-8e2... | TODOs: 8
+║  3. 2026-01-21T11:45:00
+║     Session: 5e4022cb-2d6... | TODOs: 6
+╚════════════════════════════════════════════════════════════════╝
+```
+
 ---
 
 ## File Structure
@@ -201,6 +250,183 @@ A **Stop hook** automatically saves your TODOs when the session ends.
 - When you close Claude Code or end the session
 - Automatically copies session TODOs to `.specify/todos.json`
 - No manual intervention needed
+
+---
+
+## Multi-User Collaboration
+
+### The Scenario
+
+Developer A and Developer B work on the same project at different times:
+
+```
+Day 1 - Developer A:
+  ├── Creates TODOs for authentication feature
+  ├── Marks 2 as in_progress
+  ├── Completes 1 TODO
+  └── Session ends → Auto-saves to .specify/todos.json
+
+Day 2 - Developer B:
+  ├── Runs: bash .claude/scripts/resume-work.sh
+  ├── Sees Developer A's TODOs
+  ├── Continues A's in_progress item
+  ├── Adds 3 new TODOs for database setup
+  ├── Completes 2 TODOs
+  └── Session ends → Intelligently merges with A's TODOs
+
+Day 3 - Developer A (returns):
+  ├── Runs: bash .claude/scripts/resume-work.sh
+  ├── Sees combined work:
+  │   - A's original TODOs
+  │   - B's new TODOs
+  │   - Updated statuses from B
+  └── Continues where they left off
+```
+
+### How Multi-User Merge Works
+
+When multiple sessions contribute to the same project, the system:
+
+1. **Detects Duplicates**: Uses content hash to identify same TODOs across sessions
+
+2. **Prioritizes Status**: If both sessions modified the same TODO:
+   - `completed` > `in_progress` > `pending`
+   - The more advanced status wins
+
+3. **Tracks Contributors**: Each TODO knows which sessions contributed to it
+   - `created_by`: Who created this TODO
+   - `contributors`: All sessions that touched it
+   - `updated_by`: Who last modified it
+
+4. **Preserves New Items**: TODOs unique to each session are added to the merged list
+
+5. **Saves History**: Every merge creates a historical snapshot in `.specify/todo-history/`
+
+### Example: Merge in Action
+
+**Developer A's Session** (ends first):
+```json
+{
+  "todos": [
+    {"content": "Implement login API", "status": "in_progress"},
+    {"content": "Add password hashing", "status": "pending"}
+  ]
+}
+```
+
+**Developer B's Session** (ends later):
+```json
+{
+  "todos": [
+    {"content": "Implement login API", "status": "completed"},  // Same TODO, more advanced
+    {"content": "Add database migrations", "status": "pending"} // New TODO
+  ]
+}
+```
+
+**Merged Result**:
+```json
+{
+  "todos": [
+    {
+      "content": "Implement login API",
+      "status": "completed",  // B's status wins (completed > in_progress)
+      "created_by": "session-A",
+      "updated_by": "session-B",
+      "contributors": ["session-A", "session-B"]
+    },
+    {
+      "content": "Add password hashing",
+      "status": "pending",
+      "created_by": "session-A",
+      "contributors": ["session-A"]
+    },
+    {
+      "content": "Add database migrations",
+      "status": "pending",
+      "created_by": "session-B",
+      "contributors": ["session-B"]
+    }
+  ],
+  "collaboration": {
+    "total_sessions": 2,
+    "last_contributor": "session-B"
+  }
+}
+```
+
+### Visual Indicators
+
+When loading TODOs, you'll see collaboration indicators:
+
+```
+║  [completed] Implement login API 👥2     ← 2 contributors
+║  [pending] Add password hashing          ← 1 contributor
+║  [pending] Add database migrations       ← 1 contributor
+```
+
+The `👥2` badge shows that 2 different sessions worked on this TODO.
+
+### Collaboration Commands
+
+```bash
+# See who contributed what
+python3 .claude/scripts/sync-todos.py contributors
+
+# View historical changes
+python3 .claude/scripts/sync-todos.py history
+
+# Check current TODO state
+python3 .claude/scripts/sync-todos.py status
+```
+
+### Conflict Resolution
+
+**Q: What if two people mark different statuses for the same TODO?**
+
+A: The system uses **status priority** - more advanced status wins:
+- `completed` beats `in_progress` and `pending`
+- `in_progress` beats `pending`
+
+**Q: Can I see who did what?**
+
+A: Yes! Each TODO tracks:
+- Who created it (`created_by`)
+- Who last updated it (`updated_by`)
+- All contributors (`contributors` array)
+
+**Q: What if I want to undo a merge?**
+
+A: Check the history:
+```bash
+python3 .claude/scripts/sync-todos.py history
+```
+
+Historical snapshots are saved in `.specify/todo-history/` - you can manually restore from any snapshot if needed.
+
+### Team Workflow Best Practices
+
+1. **Always run `resume-work.sh` when starting**
+   - See what others have done
+   - Avoid duplicate work
+
+2. **Check contributors before modifying TODOs**
+   ```bash
+   python3 .claude/scripts/sync-todos.py contributors
+   ```
+
+3. **Use descriptive TODO content**
+   - Merge detection uses content matching
+   - Clear descriptions prevent accidental duplicates
+
+4. **Commit `.specify/todos.json` to git**
+   - Share TODO state across team
+   - Version control your task list
+
+5. **Review history periodically**
+   ```bash
+   python3 .claude/scripts/sync-todos.py history
+   ```
 
 ---
 

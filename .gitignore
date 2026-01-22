@@ -45,3 +45,10 @@ htmlcov/
 # Temporary
 *.tmp
 *.temp
+
+# Session-specific state (will be regenerated)
+.specify/todos.json
+.specify/todo-history/
+.specify/workflow-state.json
+.specify/workflow-progress.log
+.specify/validations/

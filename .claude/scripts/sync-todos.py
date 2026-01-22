@@ -213,17 +213,26 @@ def load_from_project():
 
 
 def display_todos(data):
-    """Display TODO list with statistics."""
+    """Display TODO list with statistics and collaboration info."""
     if not data:
         return
 
     todos = data['todos']
+    collaboration = data.get('collaboration', {})
 
     print("╔════════════════════════════════════════════════════════════════╗")
     print("║              LOADING TODOs FROM PROJECT LEVEL                  ║")
     print("╠════════════════════════════════════════════════════════════════╣")
     print(f"║  Project: {data['project']}")
     print(f"║  Last Updated: {data['last_updated']}")
+
+    # Show collaboration info if multiple sessions
+    total_sessions = collaboration.get('total_sessions', 1)
+    if total_sessions > 1:
+        print(f"║  👥 Collaborative: {total_sessions} session(s) contributed")
+        last_contributor = collaboration.get('last_contributor', 'unknown')
+        print(f"║  Last Contributor: {last_contributor}")
+
     print("╠════════════════════════════════════════════════════════════════╣")
 
     # Count tasks by status
@@ -235,14 +244,23 @@ def display_todos(data):
     print("╠════════════════════════════════════════════════════════════════╣")
     print("║  TODO List:")
 
-    # Display each TODO with status (limit to 10)
+    # Display each TODO with status and contributor info
     for i, todo in enumerate(todos[:10], 1):
         status = todo.get('status', 'unknown')
         content = todo.get('content', 'No description')
+
+        # Show contributor badge if multiple contributors
+        contributors = todo.get('contributors', [])
+        contrib_badge = ''
+        if len(contributors) > 1:
+            contrib_badge = f' 👥{len(contributors)}'
+
         # Truncate long content
-        if len(content) > 50:
-            content = content[:47] + "..."
-        print(f"║  [{status}] {content}")
+        max_len = 45 if contrib_badge else 50
+        if len(content) > max_len:
+            content = content[:max_len-3] + "..."
+
+        print(f"║  [{status}] {content}{contrib_badge}")
 
     if len(todos) > 10:
         print(f"║  ... and {len(todos) - 10} more")
@@ -276,6 +294,85 @@ def show_status():
         print("  Run: python .claude/scripts/sync-todos.py save")
 
 
+def show_contributors():
+    """Show all contributors and their contributions."""
+    if not PROJECT_TODO_FILE.exists():
+        print("⚠️  No project TODOs found")
+        return
+
+    try:
+        with open(PROJECT_TODO_FILE, 'r') as f:
+            data = json.load(f)
+
+        sessions = data.get('sessions', [])
+        todos = data.get('todos', [])
+
+        print("╔════════════════════════════════════════════════════════════════╗")
+        print("║                  TODO CONTRIBUTORS                             ║")
+        print("╠════════════════════════════════════════════════════════════════╣")
+
+        if not sessions:
+            print("║  No contributors yet")
+        else:
+            print(f"║  Total Contributors: {len(sessions)}")
+            print("╠════════════════════════════════════════════════════════════════╣")
+
+            # Count contributions per session
+            for session_id in sessions:
+                short_id = session_id[:12] + "..." if len(session_id) > 12 else session_id
+
+                # Count TODOs created by this session
+                created = sum(1 for t in todos if t.get('created_by') == session_id)
+
+                # Count TODOs this session contributed to
+                contributed = sum(1 for t in todos if session_id in t.get('contributors', []))
+
+                print(f"║  📝 {short_id}")
+                print(f"║     Created: {created} | Contributed: {contributed}")
+
+        print("╚════════════════════════════════════════════════════════════════╝")
+
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"❌ Error reading TODO file: {e}")
+
+
+def show_history():
+    """Show historical snapshots of TODOs."""
+    if not HISTORY_DIR.exists():
+        print("⚠️  No history available")
+        return
+
+    history_files = sorted(HISTORY_DIR.glob("*.json"), reverse=True)
+
+    if not history_files:
+        print("⚠️  No history snapshots found")
+        return
+
+    print("╔════════════════════════════════════════════════════════════════╗")
+    print("║                    TODO HISTORY                                ║")
+    print("╠════════════════════════════════════════════════════════════════╣")
+
+    for i, history_file in enumerate(history_files[:10], 1):
+        try:
+            with open(history_file, 'r') as f:
+                snapshot = json.load(f)
+
+            timestamp = snapshot.get('timestamp', 'unknown')
+            session = snapshot.get('session', 'unknown')[:12]
+            todo_count = len(snapshot.get('todos', []))
+
+            print(f"║  {i}. {timestamp[:19]}")
+            print(f"║     Session: {session}... | TODOs: {todo_count}")
+
+        except (json.JSONDecodeError, IOError):
+            continue
+
+    if len(history_files) > 10:
+        print(f"║  ... and {len(history_files) - 10} more snapshots")
+
+    print("╚════════════════════════════════════════════════════════════════╝")
+
+
 def main():
     """Main entry point."""
     command = sys.argv[1] if len(sys.argv) > 1 else "save"
@@ -303,13 +400,21 @@ def main():
     elif command == "status":
         show_status()
 
+    elif command == "contributors":
+        show_contributors()
+
+    elif command == "history":
+        show_history()
+
     else:
-        print("Usage: python sync-todos.py {save|load|status}")
+        print("Usage: python sync-todos.py {save|load|status|contributors|history}")
         print("")
         print("Commands:")
-        print("  save   - Save current session TODOs to project level")
-        print("  load   - Load and display project TODOs")
-        print("  status - Check project TODO status")
+        print("  save         - Save current session TODOs to project level")
+        print("  load         - Load and display project TODOs")
+        print("  status       - Check project TODO status")
+        print("  contributors - Show all contributors and their contributions")
+        print("  history      - Show historical snapshots of TODOs")
         sys.exit(1)
 
 

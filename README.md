@@ -110,25 +110,40 @@ When you start a new autonomous build:
 
 This ensures best practices: all development happens on feature branches, keeping your main branch clean.
 
-### Session Recovery - TODO Persistence
+### Session Recovery - TODO Persistence + Multi-User Collaboration
 
-**Problem Solved:** TODOs are now saved across conversation sessions!
+> **Note for new users:** This boilerplate starts with a clean slate. Your first session will create the initial TODO state, which then persists across future sessions.
+
+**Problem Solved:** TODOs are now saved across conversation sessions **AND support multiple developers working on the same project!**
 
 When you start a **new conversation** (days/weeks later):
 
 1. Run: `bash .claude/scripts/resume-work.sh`
-2. See all your saved TODOs from the last session
+2. See all saved TODOs from previous sessions (yours and your teammates')
 3. Ask Claude to restore them to your new session
+
+**Multi-User Support:**
+- **Intelligent Merge**: When multiple people work on the project, their TODOs are merged automatically
+- **Conflict Resolution**: Status priority (completed > in_progress > pending)
+- **Contributor Tracking**: See who created and contributed to each TODO
+- **History Snapshots**: Every session saves a historical snapshot
 
 **How It Works:**
 - TODOs automatically save to `.specify/todos.json` when session ends
-- Persists across different conversations in the same project
+- Merges with existing TODOs from other sessions
+- Tracks contributors and maintains history in `.specify/todo-history/`
 - No more lost context when starting fresh conversations
 
 **Quick Commands:**
 ```bash
-# Resume work and see saved TODOs
+# Resume work and see saved TODOs (with collaboration info)
 bash .claude/scripts/resume-work.sh
+
+# See who contributed what
+python3 .claude/scripts/sync-todos.py contributors
+
+# View historical snapshots
+python3 .claude/scripts/sync-todos.py history
 
 # Check TODO status
 python3 .claude/scripts/sync-todos.py status
@@ -137,11 +152,41 @@ python3 .claude/scripts/sync-todos.py status
 python3 .claude/scripts/sync-todos.py save
 ```
 
+**Example Multi-User Flow:**
+```
+Developer A → Creates 5 TODOs → Session ends → Auto-saves
+Developer B → Resumes work → Sees A's TODOs → Adds 3 more → Marks 2 as completed → Auto-merges
+Developer A → Returns → Sees combined work from both sessions
+```
+
 See [`.claude/docs/SESSION-RECOVERY.md`](.claude/docs/SESSION-RECOVERY.md) for full documentation.
 
 ---
 
 ## 🚀 Quick Start
+
+### First-Time Setup
+
+1. **Clone this boilerplate:**
+   ```bash
+   git clone https://github.com/your-username/claude-code-autonomous-agent-workflow.git
+   cd claude-code-autonomous-agent-workflow
+   ```
+
+2. **Your first session will be clean** - no pre-existing TODOs or session state
+   - `.specify/todos.json` will be created when you first use TODOs
+   - Historical snapshots save to `.specify/todo-history/` automatically
+   - See `.specify/todos.example.json` for the data structure
+
+3. **Start working:**
+   ```bash
+   # Create your requirements file
+   cp requirements/example.md requirements/my-app.md
+   # Edit requirements/my-app.md
+
+   # Run autonomous build
+   claude "/sp.autonomous requirements/my-app.md"
+   ```
 
 ### Prerequisites
 
@@ -149,8 +194,11 @@ See [`.claude/docs/SESSION-RECOVERY.md`](.claude/docs/SESSION-RECOVERY.md) for f
 # Claude Code CLI
 claude --version
 
-# Node.js 18+
+# Node.js 18+ (if building Node.js projects)
 node --version
+
+# Python 3.8+ (for TODO sync scripts)
+python3 --version
 
 # Git
 git --version

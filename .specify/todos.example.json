@@ -1,0 +1,44 @@
+{
+  "last_updated": "2026-01-22T00:00:00.000000",
+  "last_session": "example-session-id",
+  "sessions": [
+    "example-session-id"
+  ],
+  "project": "your-project-name",
+  "collaboration": {
+    "total_sessions": 1,
+    "last_contributor": "example-se"
+  },
+  "todos": [
+    {
+      "content": "Example TODO: Setup project structure",
+      "status": "completed",
+      "activeForm": "Setting up structure",
+      "created_by": "example-session-id",
+      "created_at": "2026-01-22T00:00:00.000000",
+      "contributors": [
+        "example-session-id"
+      ]
+    },
+    {
+      "content": "Example TODO: Implement core feature",
+      "status": "in_progress",
+      "activeForm": "Implementing feature",
+      "created_by": "example-session-id",
+      "created_at": "2026-01-22T00:00:00.000000",
+      "contributors": [
+        "example-session-id"
+      ]
+    },
+    {
+      "content": "Example TODO: Write tests",
+      "status": "pending",
+      "activeForm": "Writing tests",
+      "created_by": "example-session-id",
+      "created_at": "2026-01-22T00:00:00.000000",
+      "contributors": [
+        "example-session-id"
+      ]
+    }
+  ]
+}
