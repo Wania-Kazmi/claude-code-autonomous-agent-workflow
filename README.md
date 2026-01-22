@@ -5,7 +5,17 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Ready-blue)](https://claude.ai/claude-code)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Autonomous](https://img.shields.io/badge/Autonomous-Spec--Kit--Plus-purple)](.)
-[![Validated](https://img.shields.io/badge/Components-51%2F51-brightgreen)](.)
+[![Validated](https://img.shields.io/badge/Components-69-brightgreen)](.)
+[![Distribution](https://img.shields.io/badge/Distribution-Ready-success)](.)
+
+**📦 What's Included Out of the Box:**
+- ✅ **Spec-Kit-Plus Pre-Installed** - Complete `.claude/` and `.specify/` framework ready to use
+- ✅ **69 Production-Ready Components** - 15 skills, 13 agents, 29 commands, 9 rules, 7 scripts, 6 templates
+- ✅ **Clean Slate** - No session data, logs, or artifacts - fresh start for every user
+- ✅ **Multi-User Collaboration** - Intelligent TODO merging, contributor tracking, session recovery
+- ✅ **Session Isolation** - `.gitignore` configured to exclude all session-specific files
+- ✅ **Quality Gates** - Component utilization enforcement, workflow validation, A-F grading
+- ✅ **Complete Documentation** - 2,343 lines of comprehensive guides
 
 ---
 
@@ -81,20 +91,23 @@ Create a simple markdown file describing what you want to build:
 claude "/sp.autonomous requirements/my-app.md"
 ```
 
+> **Note:** Spec-Kit-Plus is pre-installed in this boilerplate. The `.claude/` and `.specify/` directories contain all necessary templates, scripts, and configurations. No initialization required!
+
 ### Step 3: Boilerplate Takes Over
 
 The autonomous workflow:
 
-1. **Creates feature branch** automatically (if on main/master)
-2. **Analyzes** your requirements file
-3. **Detects** technologies (Node.js, Express, PostgreSQL, Prisma, Jest)
-4. **Generates** custom skills for your stack
-5. **Generates** specialized agents for your project
-6. **Generates** quality hooks for your workflow
-7. **Creates** specification, plan, and task breakdown
-8. **Implements** each feature using TDD
-9. **Reviews** code for security and quality
-10. **Delivers** complete project with tests
+1. **Verifies** Spec-Kit-Plus installation (pre-installed in this boilerplate)
+2. **Creates feature branch** automatically (if on main/master)
+3. **Analyzes** your requirements file
+4. **Detects** technologies (Node.js, Express, PostgreSQL, Prisma, Jest)
+5. **Generates** custom skills for your stack (if needed)
+6. **Generates** specialized agents for your project (if needed)
+7. **Generates** quality hooks for your workflow (if needed)
+8. **Creates** specification, plan, and task breakdown
+9. **Implements** each feature using TDD
+10. **Reviews** code for security and quality
+11. **Delivers** complete project with tests
 
 **Result:** A production-ready project with 80%+ test coverage, security-reviewed code, proper documentation, and all work done on a feature branch ready for PR.
 
@@ -177,6 +190,8 @@ See [`.claude/docs/SESSION-RECOVERY.md`](.claude/docs/SESSION-RECOVERY.md) for f
    - `.specify/todos.json` will be created when you first use TODOs
    - Historical snapshots save to `.specify/todo-history/` automatically
    - See `.specify/todos.example.json` for the data structure
+   - **Session Isolation**: All session-specific files are excluded by `.gitignore`
+   - You start fresh with no inherited session data
 
 3. **Start working:**
    ```bash
@@ -747,40 +762,67 @@ The boilerplate comes with pre-loaded components that work out of the box:
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Skills (10)
+### Skills (15)
 
 | Skill | What It Contains |
 |-------|------------------|
-| **coding-standards** | TypeScript/JS/React patterns |
-| **backend-patterns** | API design, services |
-| **testing-patterns** | Jest/Vitest/Playwright |
-| **api-patterns** | REST/GraphQL design |
-| **database-patterns** | Prisma/SQL/migrations |
-| **claudeception** | Session learning |
-| **mcp-code-execution** | MCP integration |
-| **skill-gap-analyzer** | Detect missing skills |
-| **workflow-validator** | Check workflow state, detect violations |
-| **component-quality-validator** | Validate generated components are production-ready |
+| **coding-standards** | TypeScript/JS/React patterns, immutability, file organization |
+| **backend-patterns** | API design, services, repository pattern |
+| **testing-patterns** | Jest/Vitest/Playwright, TDD workflow, 80% coverage |
+| **api-patterns** | REST/GraphQL design, input validation |
+| **database-patterns** | Prisma/SQL/migrations, query optimization |
+| **claudeception** | Session learning, skill extraction |
+| **mcp-code-execution-template** | MCP integration, code execution pattern |
+| **skill-gap-analyzer** | Detect missing skills, auto-generate needed components |
+| **workflow-validator** | Quality gate teacher, component utilization enforcement |
+| **component-quality-validator** | Validate generated components (A-F grading) |
+| **speckit-initialization** | Spec-Kit-Plus setup and verification |
+| **workflow-state-manager** | Workflow state tracking and persistence |
+| Plus 3 more technology-specific skills that may be generated based on your project requirements
 
-### Commands (15)
+### Commands (29 Total)
 
+**Core Autonomous Workflow:**
 | Command | What It Does |
 |---------|--------------|
-| `/sp.autonomous` | **Full autonomous build** from requirements |
+| `/sp.autonomous` | **Full autonomous build** from requirements file |
+| `/sp.specify` | Create feature specification |
+| `/sp.plan` | Generate implementation plan |
+| `/sp.tasks` | Break down into actionable tasks |
+| `/sp.implement` | Execute implementation with TDD |
+| `/sp.adr` | Create Architecture Decision Record |
+| `/sp.phr` | Record Prompt History (automatic) |
+| `/sp.constitution` | Create/update project constitution |
+| `/sp.clarify` | Ask clarifying questions |
+| `/sp.checklist` | Generate quality checklist |
+| `/sp.analyze` | Analyze codebase structure |
+| `/sp.reverse-engineer` | Generate docs from code |
+| `/sp.git.commit_pr` | Commit changes and create PR |
+| `/sp.taskstoissues` | Convert tasks to GitHub issues |
+
+**Workflow Validation:**
+| Command | What It Does |
+|---------|--------------|
 | `/q-status` | Check workflow state - which phase you're at |
 | `/q-validate` | Validate workflow order, detect violations, check component utilization |
 | `/q-reset` | Reset workflow state for fresh start |
+| `/validate-workflow` | Run full workflow validation with quality gates |
+| `/validate-components` | Check component quality (A-F grading) |
+
+**Development Commands:**
+| Command | What It Does |
+|---------|--------------|
 | `/plan` | Create implementation plan |
 | `/tdd` | Test-driven development |
 | `/code-review` | Security + quality review |
-| `/build-fix` | Fix build errors |
-| `/e2e` | E2E testing |
-| `/refactor-clean` | Remove dead code |
-| `/test-coverage` | Check coverage |
-| `/update-codemaps` | Update architecture docs |
-| `/update-docs` | Sync documentation |
-| `/validate-workflow` | Run full workflow validation |
-| `/validate-components` | Check component quality (A-F grading) |
+| `/build-fix` | Fix build errors incrementally |
+| `/e2e` | Generate and run E2E tests |
+| `/refactor-clean` | Remove dead code safely |
+| `/test-coverage` | Analyze and improve coverage |
+| `/update-codemaps` | Update architecture documentation |
+| `/update-docs` | Sync documentation from source |
+
+Plus the FPF (First Principles Framework) commands: `/q0-init`, `/q1-hypothesize`, `/q2-verify`, `/q3-validate`, `/q4-audit`, `/q5-decide`
 
 ---
 
