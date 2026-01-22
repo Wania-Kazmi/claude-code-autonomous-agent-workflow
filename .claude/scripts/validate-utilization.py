@@ -14,7 +14,20 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+
+def is_safe_path(base_path: Path, target_path: Path) -> bool:
+    """
+    Verify target path is within the base path (prevent path traversal).
+
+    Security: Protects against symlink attacks and path traversal attempts.
+    """
+    try:
+        target_resolved = target_path.resolve()
+        base_resolved = base_path.resolve()
+        return target_resolved.is_relative_to(base_resolved)
+    except (ValueError, RuntimeError, OSError):
+        return False
 
 def get_available_skills() -> List[str]:
     """Get list of available skills."""
@@ -51,11 +64,14 @@ def analyze_transcript_for_skills(transcript_path: Path = None) -> List[str]:
         claude_dir = Path.home() / '.claude' / 'projects'
         project_name = Path.cwd().name
 
-        # Search for transcript files
+        # Search for transcript files (with path traversal protection)
         transcript_files = list(claude_dir.rglob('*.jsonl'))
         if transcript_files:
-            # Get most recent
-            transcript_path = max(transcript_files, key=lambda p: p.stat().st_mtime)
+            # Filter to only safe paths within .claude directory
+            safe_files = [f for f in transcript_files if is_safe_path(claude_dir, f)]
+            if safe_files:
+                # Get most recent
+                transcript_path = max(safe_files, key=lambda p: p.stat().st_mtime)
 
     if transcript_path and transcript_path.exists():
         try:
@@ -88,7 +104,10 @@ def analyze_transcript_for_agents(transcript_path: Path = None) -> List[str]:
         claude_dir = Path.home() / '.claude' / 'projects'
         transcript_files = list(claude_dir.rglob('*.jsonl'))
         if transcript_files:
-            transcript_path = max(transcript_files, key=lambda p: p.stat().st_mtime)
+            # Filter to only safe paths within .claude directory
+            safe_files = [f for f in transcript_files if is_safe_path(claude_dir, f)]
+            if safe_files:
+                transcript_path = max(safe_files, key=lambda p: p.stat().st_mtime)
 
     if transcript_path and transcript_path.exists():
         try:
@@ -123,8 +142,8 @@ def count_hooks() -> int:
                         for hook_type in ['PreToolUse', 'PostToolUse', 'Stop', 'UserPromptSubmit']:
                             if hook_type in data['hooks']:
                                 hooks_count += len(data['hooks'][hook_type])
-            except:
-                pass
+            except (json.JSONDecodeError, IOError, OSError, KeyError) as e:
+                print(f"Warning: Could not read {hook_file}: {e}", file=sys.stderr)
 
     return hooks_count
 
@@ -138,7 +157,8 @@ def get_required_technologies() -> List[str]:
         with open(req_file) as f:
             data = json.load(f)
             return data.get('technologies_required', [])
-    except:
+    except (json.JSONDecodeError, IOError, OSError, KeyError) as e:
+        print(f"Warning: Could not read requirements file: {e}", file=sys.stderr)
         return []
 
 def validate_component_utilization(phase: int = None) -> Dict:
@@ -342,9 +362,31 @@ def generate_report(result: Dict) -> str:
 
     return report
 
+def parse_phase_arg() -> Optional[int]:
+    """
+    Parse and validate phase argument from command line.
+
+    Security: Validates phase number is within reasonable bounds.
+
+    Returns:
+        Phase number (1-20) or None if not provided/invalid
+    """
+    if len(sys.argv) < 2:
+        return None
+
+    try:
+        phase = int(sys.argv[1])
+        if not 1 <= phase <= 20:  # Reasonable bounds for workflow phases
+            print(f"Warning: Phase number should be between 1 and 20, got {phase}", file=sys.stderr)
+            return None
+        return phase
+    except ValueError:
+        print(f"Warning: Invalid phase number: {sys.argv[1]}", file=sys.stderr)
+        return None
+
 def main():
     """Main execution."""
-    phase = int(sys.argv[1]) if len(sys.argv) > 1 else None
+    phase = parse_phase_arg()
 
     print("=" * 70)
     print("COMPONENT UTILIZATION VALIDATION")
@@ -353,19 +395,20 @@ def main():
 
     result = validate_component_utilization(phase)
 
-    # Save JSON report
+    # Save JSON report (with secure file permissions)
     report_dir = Path('.specify/validations')
-    report_dir.mkdir(parents=True, exist_ok=True)
+    os.makedirs(report_dir, mode=0o700, exist_ok=True)
 
     json_file = report_dir / 'component-utilization.json'
-    with open(json_file, 'w') as f:
+    # Create file with restrictive permissions (0600 = owner read/write only)
+    with os.fdopen(os.open(str(json_file), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), 'w') as f:
         json.dump(result, f, indent=2)
     print(f"✓ JSON report saved to: {json_file}")
 
-    # Generate and save markdown report
+    # Generate and save markdown report (with secure file permissions)
     markdown_report = generate_report(result)
     md_file = report_dir / 'component-utilization-report.md'
-    with open(md_file, 'w') as f:
+    with os.fdopen(os.open(str(md_file), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), 'w') as f:
         f.write(markdown_report)
     print(f"✓ Markdown report saved to: {md_file}")
 

@@ -85,17 +85,30 @@ claude "/sp.autonomous requirements/my-app.md"
 
 The autonomous workflow:
 
-1. **Analyzes** your requirements file
-2. **Detects** technologies (Node.js, Express, PostgreSQL, Prisma, Jest)
-3. **Generates** custom skills for your stack
-4. **Generates** specialized agents for your project
-5. **Generates** quality hooks for your workflow
-6. **Creates** specification, plan, and task breakdown
-7. **Implements** each feature using TDD
-8. **Reviews** code for security and quality
-9. **Delivers** complete project with tests
+1. **Creates feature branch** automatically (if on main/master)
+2. **Analyzes** your requirements file
+3. **Detects** technologies (Node.js, Express, PostgreSQL, Prisma, Jest)
+4. **Generates** custom skills for your stack
+5. **Generates** specialized agents for your project
+6. **Generates** quality hooks for your workflow
+7. **Creates** specification, plan, and task breakdown
+8. **Implements** each feature using TDD
+9. **Reviews** code for security and quality
+10. **Delivers** complete project with tests
 
-**Result:** A production-ready project with 80%+ test coverage, security-reviewed code, and proper documentation.
+**Result:** A production-ready project with 80%+ test coverage, security-reviewed code, proper documentation, and all work done on a feature branch ready for PR.
+
+### Automatic Branch Creation
+
+When you start a new autonomous build:
+
+- **Checks** if you're on `main` or `master` branch
+- **Automatically creates** `feature/{project-name}` branch
+- **Switches** to the new branch for all work
+- **Sets up remote tracking** if origin exists
+- **Preserves** your main/master branch untouched
+
+This ensures best practices: all development happens on feature branches, keeping your main branch clean.
 
 ---
 

@@ -7,10 +7,31 @@ SCORE=0
 TOTAL=100
 ISSUES=()
 
-# Check file exists
-if [ ! -f "$SKILL_PATH" ]; then
-    echo "❌ FAIL: Skill file not found: $SKILL_PATH"
-    exit 1
+# Security: Validate path against symlink attacks
+# Resolve symlinks and verify path is within .claude/skills/ directory
+if command -v realpath >/dev/null 2>&1; then
+    RESOLVED_PATH=$(realpath "$SKILL_PATH" 2>/dev/null)
+    EXPECTED_BASE=$(realpath ".claude/skills" 2>/dev/null)
+
+    if [ ! -f "$RESOLVED_PATH" ]; then
+        echo "❌ FAIL: Skill file not found: $SKILL_PATH"
+        exit 1
+    fi
+
+    # Verify path is within expected directory (prevent path traversal)
+    if [[ "$RESOLVED_PATH" != "$EXPECTED_BASE"/* ]]; then
+        echo "❌ FAIL: Path traversal detected - file must be within .claude/skills/"
+        echo "   Resolved path: $RESOLVED_PATH"
+        echo "   Expected base: $EXPECTED_BASE"
+        exit 1
+    fi
+else
+    # Fallback if realpath not available (basic check only)
+    if [ ! -f "$SKILL_PATH" ]; then
+        echo "❌ FAIL: Skill file not found: $SKILL_PATH"
+        exit 1
+    fi
+    echo "⚠️  Warning: realpath not available, skipping symlink validation"
 fi
 
 echo "╔════════════════════════════════════════════════════════════════╗"

@@ -11,6 +11,15 @@ You are a lightweight, fast agent for git operations. Use minimal context and ex
 
 ## Supported Operations
 
+### Project Initialization (Auto Branch Creation)
+```bash
+# Automatically create feature branch for new projects
+bash .claude/scripts/init-project-branch.sh [project-name]
+```
+
+**When:** Starting a new project or autonomous workflow
+**Result:** Creates `feature/{project-name}` branch if on main/master
+
 ### Status Check
 ```bash
 git status

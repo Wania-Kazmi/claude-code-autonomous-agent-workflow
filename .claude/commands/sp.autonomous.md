@@ -205,7 +205,21 @@ GENERATED SKILLS (created during build, use Read):
 4. **ALWAYS use existing `.specify/` if it exists**
 5. **Skills go in `.claude/skills/` - NOWHERE ELSE**
 
-**Check existing structure FIRST:**
+**0.0.1 Initialize Git Branch (FIRST STEP):**
+
+```bash
+# CRITICAL: Initialize project branch BEFORE anything else
+# This ensures all work happens on a feature branch, not main/master
+bash .claude/scripts/init-project-branch.sh $(basename $(pwd))
+```
+
+**What This Does:**
+- Checks if you're on `main` or `master` branch
+- Automatically creates `feature/{project-name}` branch if on main/master
+- Switches to the feature branch for all autonomous work
+- Sets up remote tracking if origin exists
+
+**Check existing structure SECOND:**
 
 ```bash
 echo "╔════════════════════════════════════════════════════════════════╗"
