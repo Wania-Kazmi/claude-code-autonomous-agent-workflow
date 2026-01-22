@@ -1,43 +1,65 @@
 {
   "last_updated": "2026-01-22T00:00:00.000000",
-  "last_session": "example-session-id",
+  "last_session": "session-id-placeholder",
   "sessions": [
-    "example-session-id"
+    "session-id-placeholder"
   ],
-  "project": "your-project-name",
+  "project": "my-project",
   "collaboration": {
     "total_sessions": 1,
-    "last_contributor": "example-se"
+    "last_contributor": "session-placeholder"
   },
   "todos": [
     {
-      "content": "Example TODO: Setup project structure",
+      "content": "Initialize project with basic structure",
       "status": "completed",
-      "activeForm": "Setting up structure",
-      "created_by": "example-session-id",
+      "activeForm": "Initializing project structure",
+      "created_by": "session-id-placeholder",
       "created_at": "2026-01-22T00:00:00.000000",
       "contributors": [
-        "example-session-id"
+        "session-id-placeholder"
       ]
     },
     {
-      "content": "Example TODO: Implement core feature",
+      "content": "Implement main feature functionality",
       "status": "in_progress",
-      "activeForm": "Implementing feature",
-      "created_by": "example-session-id",
+      "activeForm": "Implementing main feature",
+      "created_by": "session-id-placeholder",
       "created_at": "2026-01-22T00:00:00.000000",
+      "updated_by": "session-id-placeholder",
+      "updated_at": "2026-01-22T01:00:00.000000",
       "contributors": [
-        "example-session-id"
+        "session-id-placeholder"
       ]
     },
     {
-      "content": "Example TODO: Write tests",
+      "content": "Add comprehensive test coverage (80%+ target)",
       "status": "pending",
-      "activeForm": "Writing tests",
-      "created_by": "example-session-id",
+      "activeForm": "Adding test coverage",
+      "created_by": "session-id-placeholder",
       "created_at": "2026-01-22T00:00:00.000000",
       "contributors": [
-        "example-session-id"
+        "session-id-placeholder"
+      ]
+    },
+    {
+      "content": "Write API documentation",
+      "status": "pending",
+      "activeForm": "Writing API documentation",
+      "created_by": "session-id-placeholder",
+      "created_at": "2026-01-22T00:00:00.000000",
+      "contributors": [
+        "session-id-placeholder"
+      ]
+    },
+    {
+      "content": "Set up CI/CD pipeline",
+      "status": "pending",
+      "activeForm": "Setting up CI/CD pipeline",
+      "created_by": "session-id-placeholder",
+      "created_at": "2026-01-22T00:00:00.000000",
+      "contributors": [
+        "session-id-placeholder"
       ]
     }
   ]
