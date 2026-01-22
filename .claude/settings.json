@@ -44,7 +44,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[$(date -Iseconds)] Tool: $CLAUDE_TOOL_NAME | File: $CLAUDE_FILE_PATH\" >> .claude/logs/tool-usage.log 2>/dev/null || true"
+            "command": ".claude/scripts/log-tool-usage.sh"
           }
         ]
       }
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[$(date -Iseconds)] File modified: $CLAUDE_FILE_PATH\" >> .claude/logs/file-changes.log 2>/dev/null || true"
+            "command": ".claude/scripts/log-file-change.sh"
           }
         ]
       },
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[$(date -Iseconds)] Skill invoked: $CLAUDE_SKILL_NAME\" >> .claude/logs/skill-invocations.log 2>/dev/null || true"
+            "command": ".claude/scripts/log-skill-invocation.sh"
           }
         ]
       },

@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-01-22T15:12:57.561538",
+  "phase": null,
+  "score": 92,
+  "grade": "A",
+  "utilization_percentage": 32.0,
+  "skills": {
+    "available": [
+      "api-patterns",
+      "backend-patterns",
+      "claudeception",
+      "coding-standards",
+      "component-quality-validator",
+      "database-patterns",
+      "mcp-code-execution-template",
+      "skill-gap-analyzer",
+      "speckit-initialization",
+      "testing-patterns",
+      "workflow-state-manager",
+      "workflow-validator"
+    ],
+    "used": [
+      "component-quality-validator",
+      "skill-gap-analyzer",
+      "testing-patterns",
+      "workflow-state-manager",
+      "coding-standards",
+      "workflow-validator",
+      "claudeception"
+    ],
+    "unused": [
+      "api-patterns",
+      "backend-patterns",
+      "database-patterns",
+      "mcp-code-execution-template",
+      "speckit-initialization"
+    ]
+  },
+  "agents": {
+    "available": [
+      "architect",
+      "build-error-resolver",
+      "code-reviewer",
+      "doc-updater",
+      "e2e-runner",
+      "file-ops",
+      "format-checker",
+      "git-ops",
+      "planner",
+      "refactor-cleaner",
+      "security-reviewer",
+      "tdd-guide",
+      "test-runner"
+    ],
+    "used": [
+      "code-reviewer"
+    ],
+    "unused": [
+      "architect",
+      "build-error-resolver",
+      "doc-updater",
+      "e2e-runner",
+      "file-ops",
+      "format-checker",
+      "git-ops",
+      "planner",
+      "refactor-cleaner",
+      "security-reviewer",
+      "tdd-guide",
+      "test-runner"
+    ]
+  },
+  "hooks_configured": 17,
+  "technologies_required": [],
+  "issues": [
+    "Limited agent usage: Only ['code-reviewer'] used"
+  ],
+  "bypass_detected": false
+}
